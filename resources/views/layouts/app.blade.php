@@ -89,7 +89,7 @@
             border-radius: 8px 0 0 8px;
         }
 
-        /* Gambar Mepet Di Bawah Menu Activity Log */
+        /* Gambar Mepet Di Bawah Menu */
         .sidebar-illustration {
             width: 100%;
             max-width: 180px;
@@ -172,10 +172,7 @@
                         <a href="/staff/item-management" class="nav-link-custom {{ Request::is('staff/item-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-cart-shopping"></i> Item Management
                         </a>
-                        <a href="/staff/activity-log" class="nav-link-custom {{ Request::is('staff/activity-log') ? 'active' : '' }}">
-                            <i class="fa-solid fa-chart-line"></i> Activity Log
-                        </a>
-                    @else
+                        @else
                         <a href="/dashboard" class="nav-link-custom {{ Request::is('dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-table-cells-large"></i> Dashboard
                         </a>

@@ -7,7 +7,7 @@
 <div class="container-fluid">
     
     <div id="notifSukses" class="alert alert-success alert-dismissible fade show d-none mb-3 shadow-sm" role="alert" style="border-radius: 8px; font-size: 14px; max-width: 350px; background-color: #d1e7dd; border-color: #badbcc; color: #0f5132; font-weight: 600;">
-        <i class="fa-solid fa-circle-check me-2"></i> Item berhasil ditambahkan
+        <i class="fa-solid fa-circle-check me-2"></i> <span id="textNotif">Item berhasil ditambahkan</span>
         <button type="button" class="btn-close" style="padding: 1rem 1rem; font-size: 10px;" onclick="tutupNotif()"></button>
     </div>
 
@@ -22,34 +22,67 @@
 
     <div class="card p-4 shadow-sm border-0 bg-white" style="border-radius: 16px;">
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0 text-center" style="table-layout: fixed; width: 100%;">
                 <thead>
                     <tr class="text-muted small" style="border-bottom: 2px solid #f3f4f6; font-size: 12px; font-weight: 700; color: #111827;">
-                        <th class="pb-3 border-0">NAMA ITEM</th>
-                        <th class="pb-3 border-0">CATEGORY ITEM</th>
-                        <th class="pb-3 border-0">STOCK ITEM</th>
-                        <th class="pb-3 border-0 text-center">ACTIONS</th>
+                        <th class="pb-3 border-0 text-start ps-3" style="width: 30%;">NAMA ITEM</th>
+                        <th class="pb-3 border-0" style="width: 30%;">CATEGORY ITEM</th>
+                        <th class="pb-3 border-0" style="width: 20%;">STOCK ITEM</th>
+                        <th class="pb-3 border-0 text-center" style="width: 20%;">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #f3f4f6; font-size: 14px;">
-                        <td class="fw-bold text-dark py-3 border-0">Oli Mesin</td>
-                        <td class="text-muted">Spare Part Leopard</td>
-                        <td>0</td>
-                        <td class="text-center border-0"><button class="btn btn-link text-dark p-0"><i class="fa-solid fa-pen"></i></button></td>
+                    @php
+                        $items = [
+                            ['name' => 'Oli Mesin', 'category' => 'Spare Part Leopard', 'stock' => 0],
+                            ['name' => 'Uranium-235', 'category' => 'Bahan Nuklir', 'stock' => 25],
+                            ['name' => 'Iphone 15', 'category' => 'Elektronik', 'stock' => 40],
+                        ];
+                    @endphp
+
+                    @foreach($items as $index => $item)
+                    <tr id="row-{{ $index }}" style="border-bottom: 1px solid #f3f4f6; font-size: 14px; height: 75px;">
+                        <td class="text-start ps-3 py-3 border-0">
+                            <span class="fw-bold text-dark text-view">{{ $item['name'] }}</span>
+                            <div class="text-edit d-none" style="max-width: 200px;">
+                                <input type="text" id="input-name-{{ $index }}" class="form-control form-control-sm shadow-sm" value="{{ $item['name'] }}" style="font-size: 14px; border-radius: 6px;">
+                            </div>
+                        </td>
+
+                        <td class="border-0">
+                            <span class="text-muted text-view">{{ $item['category'] }}</span>
+                            <div class="text-edit d-none mx-auto" style="max-width: 200px;">
+                                <input type="text" id="input-cat-{{ $index }}" class="form-control form-control-sm shadow-sm text-center" value="{{ $item['category'] }}" style="font-size: 14px; border-radius: 6px;">
+                            </div>
+                        </td>
+
+                        <td class="border-0">
+                            <span class="text-dark fw-semibold text-view-stock">{{ $item['stock'] }}</span>
+                        </td>
+
+                        <td class="border-0 text-center">
+                            <div class="action-view">
+                                <button class="btn btn-link text-dark p-0 border-0 bg-transparent me-2" onclick="bukaModeEdit({{ $index }})">
+                                    <i class="fa-solid fa-pen fs-5"></i>
+                                </button>
+                            </div>
+
+                            <div class="action-edit d-none align-items-center justify-content-center" style="gap: 12px; height: 38px;">
+                                <button class="btn p-0 border-0 bg-transparent text-danger" onclick="hapusBaris({{ $index }})">
+                                    <i class="fas fa-trash-alt fs-5"></i>
+                                </button>
+                                
+                                <div style="width: 85px;">
+                                    <input type="number" id="input-stock-{{ $index }}" class="form-control text-center fw-bold form-control-sm shadow-sm" value="{{ $item['stock'] }}" min="0" style="border: 1px solid #999999; border-radius: 8px; height: 38px; font-size: 15px;">
+                                </div>
+                                
+                                <button class="btn p-0 border-0 bg-transparent text-success d-flex align-items-center" onclick="simpanModeEdit({{ $index }})">
+                                    <i class="fas fa-check-circle fs-3"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #f3f4f6; font-size: 14px;">
-                        <td class="fw-bold text-dark py-3 border-0">Uranium-235</td>
-                        <td class="text-muted">Bahan Nuklir</td>
-                        <td>25</td>
-                        <td class="text-center border-0"><button class="btn btn-link text-dark p-0"><i class="fa-solid fa-pen"></i></button></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f3f4f6; font-size: 14px;">
-                        <td class="fw-bold text-dark py-3 border-0">Iphone 15</td>
-                        <td class="text-muted">Elektronik</td>
-                        <td>40</td>
-                        <td class="text-center border-0"><button class="btn btn-link text-dark p-0"><i class="fa-solid fa-pen"></i></button></td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -94,25 +127,82 @@
 </div>
 
 <script>
-    function prosesTambahBarang(event) {
-        event.preventDefault(); // Mencegah halaman reload & error 404/500
+    function bukaModeEdit(index) {
+        var row = document.getElementById('row-' + index);
+        
+        row.querySelectorAll('.text-view').forEach(el => el.classList.add('d-none'));
+        row.querySelectorAll('.text-edit').forEach(el => el.classList.remove('d-none'));
+        
+        row.querySelector('.text-view-stock').classList.add('d-none'); // Sembunyikan text stock lama
+        row.querySelector('.action-view').classList.add('d-none');
+        
+        var editAction = row.querySelector('.action-edit');
+        editAction.classList.remove('d-none');
+        editAction.classList.add('d-flex');
+    }
 
-        // Tutup modal popup secara programmatic
+    function simpanModeEdit(index) {
+        var row = document.getElementById('row-' + index);
+        
+        // Ambil value ketikan baru dari input text & number spinner
+        var newName = document.getElementById('input-name-' + index).value;
+        var newCat = document.getElementById('input-cat-' + index).value;
+        var newStock = document.getElementById('input-stock-' + index).value;
+        
+        // Tembak teks baru ke penampung visual view
+        row.querySelectorAll('.text-view')[0].innerText = newName;
+        row.querySelectorAll('.text-view')[1].innerText = newCat;
+        row.querySelector('.text-view-stock').innerText = newStock;
+        
+        // Kembalikan ke mode view normal
+        row.querySelectorAll('.text-view').forEach(el => el.classList.remove('d-none'));
+        row.querySelectorAll('.text-edit').forEach(el => el.classList.add('d-none'));
+        row.querySelector('.text-view-stock').classList.remove('d-none');
+        
+        row.querySelector('.action-view').classList.remove('d-none');
+        var editAction = row.querySelector('.action-edit');
+        editAction.classList.add('d-none');
+        editAction.classList.remove('d-flex');
+        
+        // TAMPILKAN NOTIFIKASI HIJAU DI ATAS
+        document.getElementById('textNotif').innerText = "Item berhasil diubah";
+        var notif = document.getElementById('notifSukses');
+        notif.classList.remove('d-none');
+        
+        // Menutup alert otomatis dalam 4 detik
+        setTimeout(function() {
+            tutupNotif();
+        }, 4000);
+    }
+
+    function prosesTambahBarang(event) {
+        event.preventDefault();
         var modalElemen = document.getElementById('adminTambahBarangModal');
         var modalInstance = bootstrap.Modal.getInstance(modalElemen);
         modalInstance.hide();
 
-        // Tampilkan notifikasi hijau di atas kolom search
+        document.getElementById('textNotif').innerText = "Item berhasil ditambahkan";
         var notif = document.getElementById('notifSukses');
         notif.classList.remove('d-none');
 
-        // Reset isi form biar kosong lagi pas dibuka nanti
         document.getElementById('formTambahBarang').reset();
+        
+        setTimeout(function() {
+            tutupNotif();
+        }, 4000);
+    }
+
+    function hapusBaris(index) {
+        if(confirm("Hapus item produk ini dari database SIGMA?")) {
+            document.getElementById('row-' + index).remove();
+        }
     }
 
     function tutupNotif() {
         var notif = document.getElementById('notifSukses');
-        notif.classList.add('d-none');
+        if(notif) {
+            notif.classList.add('d-none');
+        }
     }
 </script>
 @endsection

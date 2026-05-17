@@ -104,7 +104,6 @@
                                 <td class="text-center fw-bold text-danger py-3 border-0">0</td>
                             </tr>
                             <tr>
-                                <td>id_229</td>
                                 <td class="text-start fw-bold text-dark py-3 border-0">Cat</td>
                                 <td class="text-center text-muted py-3 border-0">xx/xx/xxxx</td>
                                 <td class="text-center fw-bold py-3 border-0 text-dark">1,024</td>
