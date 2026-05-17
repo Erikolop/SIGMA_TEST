@@ -70,13 +70,14 @@
         <img src="{{ asset('images/logosigma.png') }}" class="img-fluid mb-3" style="max-height: 180px; width: auto;" alt="Logo SIGMA">
         
         <h3 class="fw-bold mb-4 text-uppercase" style="letter-spacing: 0.5px; color: #111827;">WELCOME TO SIGMA</h3>
-        
-        <form id="loginForm">
+
+        <form action="/login" method="POST" id="loginForm">
+            @csrf 
             <div class="text-start mb-3">
-                <label class="fw-bold text-muted ms-2 mb-1">USERNAME</label>
+                <label class="fw-bold text-muted ms-2 mb-1">EMAIL ADDRESS</label>
                 <div class="form-group-custom">
-                    <i class="fa-regular fa-user"></i>
-                    <input type="text" id="usernameInput" class="form-control" placeholder="Enter your username">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" name="email" id="emailInput" class="form-control" placeholder="Enter your email" value="{{ old('email') }}" autofocus>
                 </div>
             </div>
             
@@ -84,40 +85,25 @@
                 <label class="fw-bold text-muted ms-2 mb-1">PASSWORD</label>
                 <div class="form-group-custom">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="passwordInput" class="form-control" placeholder="••••••••">
+                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="••••••••">
                     <i class="fa-regular fa-eye" id="togglePassword" style="left: auto; right: 20px; cursor: pointer;"></i>
                 </div>
             </div>
             
-            <button type="button" class="btn btn-login shadow-sm" onclick="handleLogin()">Login</button>
+            <button type="submit" class="btn btn-login shadow-sm">Login</button>
         </form>
     </div>
 
     <script>
-        // Fitur Intip Password (Klik ikon mata)
         const togglePassword = document.querySelector('#togglePassword');
         const passwordInput = document.querySelector('#passwordInput');
 
         togglePassword.addEventListener('click', function () {
-            // Tukar tipe input antara password dan text
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
-            // Tukar ikon mata (buka / coret)
             this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
-
-        // Fitur Jalur Navigasi Login (Bypass Admin / Staff)
-        function handleLogin() {
-            const username = document.getElementById('usernameInput').value.toLowerCase().trim();
-            
-            if (username === 'staff') {
-                window.location.href = '/staff/dashboard'; 
-            } else {
-                window.location.href = '/dashboard'; 
-            }
-        }
     </script>
 </body>
 </html>

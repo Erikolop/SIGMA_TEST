@@ -131,6 +131,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
         }
 
         /* Main Content Area */
@@ -164,31 +165,21 @@
             <div>
                 <div class="sidebar-brand">SIGMA</div>
                 <div class="nav-menu">
-                    
-                    @if(Request::is('staff*'))
-                        <a href="/staff/dashboard" class="nav-link-custom {{ Request::is('staff/dashboard') ? 'active' : '' }}">
-                            <i class="fa-solid fa-table-cells-large"></i> Dashboard
-                        </a>
-                        <a href="/staff/item-management" class="nav-link-custom {{ Request::is('staff/item-management') ? 'active' : '' }}">
-                            <i class="fa-solid fa-cart-shopping"></i> Item Management
-                        </a>
-                        @else
-                        <a href="/dashboard" class="nav-link-custom {{ Request::is('dashboard') ? 'active' : '' }}">
-                            <i class="fa-solid fa-table-cells-large"></i> Dashboard
-                        </a>
-                        <a href="/admin/item-management" class="nav-link-custom {{ Request::is('*item-management*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-cart-shopping"></i> Item Management
-                        </a>
-                        <a href="/admin/category-management" class="nav-link-custom {{ Request::is('*category-management*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-layer-group"></i> Category Management
-                        </a>
-                        <a href="/admin/staff-management" class="nav-link-custom {{ Request::is('*staff-management*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-users"></i> Staff Management
-                        </a>
-                        <a href="/admin/activity-log" class="nav-link-custom {{ Request::is('*activity-log*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-chart-line"></i> Activity Log
-                        </a>
-                    @endif
+                    <a href="/dashboard" class="nav-link-custom {{ Request::is('dashboard') ? 'active' : '' }}">
+                        <i class="fa-solid fa-table-cells-large"></i> Dashboard
+                    </a>
+                    <a href="/admin/item-management" class="nav-link-custom {{ Request::is('*item-management*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-cart-shopping"></i> Item Management
+                    </a>
+                    <a href="/admin/category-management" class="nav-link-custom {{ Request::is('*category-management*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-layer-group"></i> Category Management
+                    </a>
+                    <a href="/admin/staff-management" class="nav-link-custom {{ Request::is('*staff-management*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users"></i> Staff Management
+                    </a>
+                    <a href="/admin/activity-log" class="nav-link-custom {{ Request::is('*activity-log*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-chart-line"></i> Activity Log
+                    </a>
                 </div>
                 
                 <img src="{{ asset('images/fotodbkiri.png') }}" class="sidebar-illustration" alt="Gudang Illustration">
@@ -196,24 +187,20 @@
 
             <div class="sidebar-bottom">
                 <div class="user-profile-section">
-                    @if(Request::is('staff*'))
-                        <div class="user-info">
-                            <h6>Randi</h6>
-                            <span>Staff<br>V1.0</span>
-                        </div>
-                        <img src="https://ui-avatars.com/api/?name=Randi&background=111827&color=fff" class="rounded-circle" style="width: 40px; height: 40px;" alt="Avatar Staff">
-                    @else
-                        <div class="user-info">
-                            <h6>Chico</h6>
-                            <span>Admin<br>V1.0</span>
-                        </div>
-                        <img src="https://ui-avatars.com/api/?name=Chico&background=3f3d8f&color=fff" class="rounded-circle" style="width: 40px; height: 40px;" alt="Avatar Admin">
-                    @endif
+                    <div class="user-info">
+                        <h6>Chico</h6>
+                        <span>Admin<br>V1.0</span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Chico&background=3f3d8f&color=fff" class="rounded-circle" style="width: 40px; height: 40px;" alt="Avatar Admin">
                 </div>
 
-                <a href="/" class="btn-logout">
+                <a href="#" class="btn-logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
                 </a>
+
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </div>
         </div>
 
