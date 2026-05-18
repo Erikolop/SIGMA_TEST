@@ -47,6 +47,7 @@ Route::post('/logout', function (Request $request) {
 Route::get('/dashboard', function () { return view('admin.dashboard'); });
 Route::get('/admin/item-management', function () { return view('admin.item_management'); });
 Route::get('/admin/category-management', function () { return view('admin.category'); });
+Route::get('/admin/category-detail', function () { return view('admin.category_detail'); });
 Route::get('/admin/staff-management', function () { return view('admin.staff'); });
 Route::get('/admin/activity-log', function () { return view('admin.activity_log'); });
 

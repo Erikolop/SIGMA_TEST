@@ -3,6 +3,8 @@
 @section('title', 'Activity Log - SIGMA')
 
 @section('content')
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <style>
     /* Reset padding bawaan content body biar tab atasnya nempel presisi */
     .content-body {
@@ -56,6 +58,18 @@
         font-size: 14px;
         background-color: #ffffff;
     }
+
+    /* CONTAINER UTAMA FILTER KALENDER SLIDE */
+    .calendar-interactive-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .calendar-click-wrapper {
+        position: relative;
+        display: inline-block;
+    }
     .btn-calendar {
         background-color: #d1d5db;
         border: none;
@@ -63,9 +77,59 @@
         padding: 8px 16px;
         color: #374151;
         transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .btn-calendar:hover {
         background-color: #9ca3af;
+    }
+
+    /* Input date transparan di atas tombol */
+    .input-date-hidden-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .input-date-hidden-overlay::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100%; height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* KOTAK KECIL HASIL SLIDE TANGGAL (Gaya Figma Clean) */
+    .slide-date-badge {
+        background-color: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.04);
+    }
+    .btn-clear-date {
+        background: none;
+        border: none;
+        color: #93c5fd;
+        cursor: pointer;
+        padding: 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+    }
+    .btn-clear-date:hover {
+        color: #1e40af;
     }
 
     /* 3. Custom Table Activity Log */
@@ -134,9 +198,11 @@
     .pagination-custom a:hover {
         color: #ffffff;
     }
+
+    [x-cloak] { display: none !important; }
 </style>
 
-<div class="activity-log-wrapper">
+<div class="activity-log-wrapper" x-data="{ selectedDate: '', showBadge: false }">
     <div class="tab-header">
         <a href="#" class="tab-item">Activity Logs</a>
     </div>
@@ -146,9 +212,33 @@
             <i class="fa-solid fa-search"></i>
             <input type="text" class="form-control" placeholder="Search">
         </div>
-        <button class="btn btn-calendar">
-            <i class="fa-regular fa-calendar-days fs-5"></i>
-        </button>
+        
+        <div class="calendar-interactive-container">
+            <div class="calendar-click-wrapper">
+                <button type="button" class="btn-calendar">
+                    <i class="fa-regular fa-calendar-days fs-5"></i>
+                </button>
+                <input type="date" class="input-date-hidden-overlay" 
+                       x-model="selectedDate"
+                       @change="if(selectedDate) { showBadge = true } else { showBadge = false }">
+            </div>
+
+            <div class="slide-date-badge" 
+                 x-show="showBadge" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform -translate-x-4"
+                 x-transition:enter-end="opacity-100 transform translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 transform translate-x-0"
+                 x-transition:leave-end="opacity-0 transform -translate-x-4"
+                 x-cloak>
+                <i class="fa-solid fa-filter fs-7"></i>
+                <span x-text="selectedDate"></span>
+                <button type="button" class="btn-clear-date" @click="selectedDate = ''; showBadge = false" title="Hapus Filter">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="table-responsive-custom">

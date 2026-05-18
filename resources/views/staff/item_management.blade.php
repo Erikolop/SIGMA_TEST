@@ -23,6 +23,22 @@
         letter-spacing: 0.5px;
     }
 
+    /* KUNCI NOTIFIKASI: Alert Hijau Elegan di Atas Search Bar */
+    .alert-success-figma {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
     /* 2. Search & Top Action Bar */
     .search-action-bar {
         display: flex;
@@ -189,6 +205,9 @@
         align-items: center;
         font-size: 13px;
     }
+    .pg-container {
+        display: flex; gap: 6px; align-items: center;
+    }
     .pg-container a {
         color: rgba(255, 255, 255, 0.6);
         text-decoration: none;
@@ -201,13 +220,11 @@
         border-radius: 4px;
     }
 
-    /* ==========================================
-       KUNCI PERBAIKAN: POPUP MODAL GAYA FIGMA BARU
-       ========================================== */
+    /* Modal Overlay Custom */
     .modal-overlay-custom {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(30, 41, 59, 0.6); /* Latar gelap transparan blur */
+        background-color: rgba(30, 41, 59, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -215,25 +232,23 @@
     }
     .modal-card-custom {
         background-color: #ffffff;
-        width: 620px; /* Ukuran lebar proporsional figma */
+        width: 620px;
         border-radius: 16px;
         padding: 45px 50px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         border: none;
     }
     
-    /* Judul Header Clean di Dalam Card */
     .figma-header-title {
         text-align: center;
         margin-bottom: 40px;
     }
     .figma-header-title h3 {
-        color: #3b82f6; /* Biru terang khas figma */
+        color: #3b82f6;
         font-size: 32px;
         font-weight: 500;
         margin: 0;
         letter-spacing: 0.5px;
-        font-family: sans-serif;
     }
     .figma-header-title p {
         color: #94a3b8;
@@ -245,7 +260,6 @@
         text-transform: uppercase;
     }
 
-    /* Form Fields Styling */
     .figma-form-group {
         margin-bottom: 24px;
     }
@@ -253,7 +267,7 @@
         display: block;
         font-size: 11px;
         font-weight: 800;
-        color: #64748b; /* Abu-abu label figma */
+        color: #64748b;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         margin-bottom: 10px;
@@ -261,25 +275,23 @@
     .figma-form-input {
         width: 100%;
         padding: 14px 18px;
-        border: 2px solid #cbd5e1; /* Border abu-abu halus figma */
+        border: 2px solid #cbd5e1;
         border-radius: 8px;
         font-size: 15px;
         color: #334155;
         outline: none;
-        background-color: #f8fafc; /* Latar input agak pudar */
+        background-color: #f8fafc;
         transition: border-color 0.2s ease;
     }
     .figma-form-input:focus {
         border-color: #3b82f6;
         background-color: #ffffff;
     }
-    /* Mengubah warna teks placeholder agar tipis samar-samar */
     .figma-form-input::placeholder {
         color: #cbd5e1;
         font-weight: 400;
     }
 
-    /* Link Tambah Produk */
     .figma-add-more-link {
         display: block;
         text-align: center;
@@ -292,7 +304,6 @@
         cursor: pointer;
     }
 
-    /* Tombol Kirim Utama Biru */
     .btn-figma-submit {
         width: 45%;
         background-color: #2563eb;
@@ -305,7 +316,7 @@
         letter-spacing: 2px;
         cursor: pointer;
         display: block;
-        margin: 0 auto; /* Otomatis rata tengah */
+        margin: 0 auto;
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         transition: background 0.2s;
     }
@@ -316,9 +327,14 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div x-data="{ openModal: false }">
+<div x-data="{ openModal: false, showNotification: false, successMessage: '' }">
 
     <h2 class="page-title-center">Item Management</h2>
+
+    <div class="alert-success-figma" x-show="showNotification" x-transition.opacity x-cloak>
+        <i class="fa-solid fa-circle-check"></i>
+        <span x-text="successMessage"></span>
+    </div>
 
     <div class="search-action-bar">
         <div class="left-action-controls">
@@ -381,8 +397,9 @@
 
                             <div class="action-edit-layout" x-show="editingId === '{{ $item['id'] }}'" x-cloak>
                                 <i class="fa-solid fa-pen icon-pen-grey" style="color: #4b5563 !important;"></i>
-                                <input type="number" class="qty-number-browser" value="2" min="0">
-                                <button class="btn-submit-green-circle" @click="editingId = null">
+                                <input type="number" class="qty-number-browser" value="{{ $item['stock'] }}" min="0">
+                                
+                                <button class="btn-submit-green-circle" @click="editingId = null; successMessage = 'Stok {{ $item['name'] }} berhasil diperbarui!'; showNotification = true; setTimeout(() => showNotification = false, 3000)">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
                             </div>
@@ -415,21 +432,21 @@
                 <p>SIGMA</p>
             </div>
             
-            <form @submit.prevent="openModal = false">
+            <form @submit.prevent="openModal = false; successMessage = 'Produk baru sukses ditambahkan ke daftar inventaris!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
                 
                 <div class="figma-form-group">
                     <label class="figma-form-label">Nama Produk</label>
-                    <input type="text" class="figma-form-input" placeholder="Contoh: Meja Kerja Kayu Jati">
+                    <input type="text" class="figma-form-input" placeholder="Contoh: Meja Kerja Kayu Jati" required>
                 </div>
                 
                 <div class="figma-form-group">
                     <label class="figma-form-label">Jumlah Unit</label>
-                    <input type="number" class="figma-form-input" value="0" min="0">
+                    <input type="number" class="figma-form-input" value="0" min="0" required>
                 </div>
                 
                 <div class="figma-form-group">
                     <label class="figma-form-label">Tipe Kelola</label>
-                    <input type="text" class="figma-form-input" placeholder="Contoh: Keluar atau Masuk">
+                    <input type="text" class="figma-form-input" placeholder="Contoh: Keluar atau Masuk" required>
                 </div>
                 
                 <span class="figma-add-more-link" @click="alert('Fitur tambah form menyusul, Chic!')">+ Tambah Produk Lainnya</span>
