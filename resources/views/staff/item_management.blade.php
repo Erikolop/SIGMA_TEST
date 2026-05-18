@@ -106,25 +106,6 @@
         background-size: 14px;
     }
 
-    .btn-add-item-blue {
-        background-color: #bfdbfe;
-        color: #1e3a8a;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 9px 18px;
-        border-radius: 8px;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-    .btn-add-item-blue:hover {
-        background-color: #93c5fd;
-        color: #1d4ed8;
-    }
-
     /* 3. Table Layout */
     .table-card-staff {
         background-color: #ffffff;
@@ -220,114 +201,10 @@
         border-radius: 4px;
     }
 
-    /* Modal Overlay Custom */
-    .modal-overlay-custom {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background-color: rgba(30, 41, 59, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    }
-    .modal-card-custom {
-        background-color: #ffffff;
-        width: 620px;
-        border-radius: 16px;
-        padding: 45px 50px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        border: none;
-    }
-    
-    .figma-header-title {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-    .figma-header-title h3 {
-        color: #3b82f6;
-        font-size: 32px;
-        font-weight: 500;
-        margin: 0;
-        letter-spacing: 0.5px;
-    }
-    .figma-header-title p {
-        color: #94a3b8;
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 2px;
-        margin-top: 5px;
-        margin-bottom: 0;
-        text-transform: uppercase;
-    }
-
-    .figma-form-group {
-        margin-bottom: 24px;
-    }
-    .figma-form-label {
-        display: block;
-        font-size: 11px;
-        font-weight: 800;
-        color: #64748b;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-    .figma-form-input {
-        width: 100%;
-        padding: 14px 18px;
-        border: 2px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 15px;
-        color: #334155;
-        outline: none;
-        background-color: #f8fafc;
-        transition: border-color 0.2s ease;
-    }
-    .figma-form-input:focus {
-        border-color: #3b82f6;
-        background-color: #ffffff;
-    }
-    .figma-form-input::placeholder {
-        color: #cbd5e1;
-        font-weight: 400;
-    }
-
-    .figma-add-more-link {
-        display: block;
-        text-align: center;
-        color: #3b82f6;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: underline;
-        margin-top: 30px;
-        margin-bottom: 35px;
-        cursor: pointer;
-    }
-
-    .btn-figma-submit {
-        width: 45%;
-        background-color: #2563eb;
-        color: #ffffff;
-        border: none;
-        padding: 14px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        cursor: pointer;
-        display: block;
-        margin: 0 auto;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        transition: background 0.2s;
-    }
-    .btn-figma-submit:hover {
-        background-color: #1d4ed8;
-    }
-
     [x-cloak] { display: none !important; }
 </style>
 
-<div x-data="{ openModal: false, showNotification: false, successMessage: '' }">
+<div x-data="{ showNotification: false, successMessage: '' }">
 
     <h2 class="page-title-center">Item Management</h2>
 
@@ -352,11 +229,7 @@
                 </select>
             </div>
         </div>
-
-        <button class="btn-add-item-blue shadow-sm" @click="openModal = true">
-            <i class="fa-solid fa-plus"></i> Add Item
-        </button>
-    </div>
+        </div>
 
     <div class="table-card-staff" x-data="{ editingId: null }">
         <table class="staff-table text-center align-middle">
@@ -424,38 +297,5 @@
         </div>
     </div>
 
-    <div class="modal-overlay-custom" x-show="openModal" x-transition.opacity x-cloak>
-        <div class="modal-card-custom" @click.away="openModal = false" x-transition.scale>
-            
-            <div class="figma-header-title">
-                <h3>FORMULIR INVENTARIS PRODUK</h3>
-                <p>SIGMA</p>
-            </div>
-            
-            <form @submit.prevent="openModal = false; successMessage = 'Produk baru sukses ditambahkan ke daftar inventaris!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
-                
-                <div class="figma-form-group">
-                    <label class="figma-form-label">Nama Produk</label>
-                    <input type="text" class="figma-form-input" placeholder="Contoh: Meja Kerja Kayu Jati" required>
-                </div>
-                
-                <div class="figma-form-group">
-                    <label class="figma-form-label">Jumlah Unit</label>
-                    <input type="number" class="figma-form-input" value="0" min="0" required>
-                </div>
-                
-                <div class="figma-form-group">
-                    <label class="figma-form-label">Tipe Kelola</label>
-                    <input type="text" class="figma-form-input" placeholder="Contoh: Keluar atau Masuk" required>
-                </div>
-                
-                <span class="figma-add-more-link" @click="alert('Fitur tambah form menyusul, Chic!')">+ Tambah Produk Lainnya</span>
-                
-                <button type="submit" class="btn-figma-submit">KIRIM</button>
-                
-            </form>
-        </div>
     </div>
-
-</div>
 @endsection

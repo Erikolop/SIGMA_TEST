@@ -223,6 +223,27 @@
     .pg-staff-container { display: flex; gap: 6px; align-items: center; }
     .pg-staff-container a { color: rgba(255, 255, 255, 0.6); text-decoration: none; padding: 4px 10px; font-weight: 600; }
     .active-pg-box { background-color: #2563eb; color: #ffffff !important; border-radius: 4px; }
+
+    /* ==========================================
+       TITIK SISIPAN 1: CSS ANIMASI GETAR MODAL KEAMANAN CHICO
+       ========================================== */
+    @keyframes shakeAnimation {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+    }
+    .shake-effect { 
+        animation: shakeAnimation 0.4s ease-in-out !important; 
+    }
+    .secure-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(30, 41, 59, 0.6); display: flex; 
+        align-items: center; justify-content: center; z-index: 10000;
+    }
+    .secure-card {
+        background-color: #ffffff; width: 420px; border-radius: 14px; 
+        padding: 35px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
+    }
     
     [x-cloak] { display: none !important; }
 </style>
@@ -250,6 +271,7 @@
     openEditModal: false, 
     openDeleteModal: false,
     openBulkDeleteModal: false,
+    openSecureModal: false, 
     showNotification: false, 
     successMessage: '',
     targetStaffName: '',
@@ -258,6 +280,13 @@
     allUserIds: {{ $all_ids }},
     editData: { id: '', name: '', email: '', username: '', role: '' },
     
+    // Penampung State Secure Pasca Verifikasi
+    actionType: '', 
+    adminPasswordInput: '',
+    secureError: false,
+    isShaking: false,
+    tempNewName: '',
+
     // Fungsi pembantu select all checkbox
     toggleAll() {
         if (this.selectedUsers.length === this.allUserIds.length) {
@@ -337,7 +366,7 @@
         <div class="modal-card-custom" @click.away="openAddModal = false" x-transition.scale>
             <h4 class="text-center mb-4" style="color: #3f3d8f; font-weight: 700;">ADD NEW USER</h4>
             
-            <form x-data="{ newName: '' }" @submit.prevent="openAddModal = false; successMessage = 'Akun baru untuk ' + newName + ' sukses terdaftar!'; showNotification = true; setTimeout(() => showNotification = false, 3500); newName = ''">
+            <form x-data="{ newName: '' }" @submit.prevent="tempNewName = newName; actionType = 'add'; openSecureModal = true; newName = ''">
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Full Name</label>
                     <input type="text" class="form-control" placeholder="Masukkan nama lengkap" x-model="newName" required>
@@ -369,7 +398,7 @@
         <div class="modal-card-custom" @click.away="openEditModal = false" x-transition.scale>
             <h4 class="text-center mb-4" style="color: #3f3d8f; font-weight: 700;">EDIT USER ACCOUNT</h4>
             
-            <form @submit.prevent="openEditModal = false; successMessage = 'Perubahan data ' + editData.name + ' berhasil disimpan!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
+            <form @submit.prevent="actionType = 'edit'; openSecureModal = true;">
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Full Name</label>
                     <input type="text" class="form-control" x-model="editData.name" required>
@@ -402,12 +431,12 @@
             <div class="icon-warning-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="delete-modal-title">Yakin mau ngehapus akun ini?</div>
             <div class="delete-modal-text">
-                Akun staff <strong class="text-dark" x-text="'“' + targetStaffName + '”'"></strong> bakal dihapus permanen dari sistem SIGMA dan bakal menghantui random sabila mustaqeemm, aamiinn.
+                Akun staff <strong class="text-dark" x-text="'“' + targetStaffName + '”'"></strong> bakal dihapus permanen dari sistem SIGMA.
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn-modal-action btn-cancel-grey" @click="openDeleteModal = false">Batal</button>
                 <button type="button" class="btn-modal-action btn-confirm-red" @click="openDeleteModal = false; successMessage = 'Akun ' + targetStaffName + ' resmi dihapus dari database!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
-                    Yoi, Hapus!
+                    HAPUS
                 </button>
             </div>
         </div>
@@ -416,16 +445,63 @@
     <div class="modal-overlay-delete" x-show="openBulkDeleteModal" x-transition.opacity x-cloak>
         <div class="modal-card-delete" @click.away="openBulkDeleteModal = false" x-transition.scale>
             <div class="icon-warning-box"><i class="fa-solid fa-dumpster-fire"></i></div>
-            <div class="delete-modal-title">Yakin mau membumi hanguskan akun-akun ini?</div>
+            <div class="delete-modal-title">Yakin mau menghapus akun-akun ini?</div>
             <div class="delete-modal-text">
                 Kamu milih <strong class="text-danger" x-text="selectedUsers.length + ' akun staff'"></strong> sekaligus. Semuanya bakal dihanguskan permanen dari database SIGMA!
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn-modal-action btn-cancel-grey" @click="openBulkDeleteModal = false">Batal</button>
                 <button type="button" class="btn-modal-action btn-confirm-red" @click="openBulkDeleteModal = false; successMessage = selectedUsers.length + ' Akun staff sukses dibumihanguskan bersamaan!'; selectedUsers = []; showNotification = true; setTimeout(() => showNotification = false, 4000)">
-                    Yoi, Babat Semua!
+                    HAPUS
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div class="secure-overlay" x-show="openSecureModal" x-transition.opacity x-cloak>
+        <div class="secure-card" :class="{ 'shake-effect': isShaking }" @click.away="openSecureModal = false; adminPasswordInput = ''; secureError = false;" x-transition.scale>
+            <div style="color: #3f3d8f; font-size: 44px; margin-bottom: 15px;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h5 style="font-weight: 700; color: #1e293b;">Verifikasi Password Admin</h5>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 25px;">Masukkan password akun admin untuk mengonfirmasi perubahan data staff.</p>
+            
+            <form @submit.prevent="
+                if (adminPasswordInput === 'admin') {
+                    secureError = false;
+                    openSecureModal = false;
+                    adminPasswordInput = '';
+                    
+                    if (actionType === 'add') {
+                        openAddModal = false;
+                        successMessage = 'Akun baru untuk ' + tempNewName + ' sukses terdaftar!';
+                    } else if (actionType === 'edit') {
+                        openEditModal = false;
+                        successMessage = 'Perubahan data ' + editData.name + ' berhasil disimpan!';
+                    }
+                    
+                    showNotification = true;
+                    setTimeout(() => showNotification = false, 3500);
+                } else {
+                    secureError = true;
+                    isShaking = true;
+                    adminPasswordInput = '';
+                    // Reset getaran setelah 400 milidetik agar bisa joget getar lagi pas disubmit ulang
+                    setTimeout(() => isShaking = false, 400);
+                }
+            ">
+                <div class="mb-3 text-start">
+                    <div class="text-danger fw-bold mb-2 text-center" x-show="secureError" style="font-size: 12px;" x-cloak>
+                        ❌ Password Salah, Akses Ditolak!
+                    </div>
+                    <input type="password" class="form-control text-center" placeholder="••••••••" x-model="adminPasswordInput" required autofocus style="border-radius: 8px;">
+                </div>
+                
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button type="button" class="btn btn-light btn-sm" @click="openSecureModal = false; adminPasswordInput = ''; secureError = false;" style="font-size: 13px; font-weight:600;">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: #3f3d8f; border: none; font-size: 13px; font-weight:600; color: white;">Verify Password</button>
+                </div>
+            </form>
         </div>
     </div>
 

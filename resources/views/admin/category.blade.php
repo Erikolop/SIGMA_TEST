@@ -222,12 +222,12 @@
             <div class="icon-warning-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="delete-modal-title">Yakin mau ngehapus kategori ini?</div>
             <div class="delete-modal-text">
-                Kategori <strong class="text-dark" x-text="'“' + targetCatName + '”'"></strong> bakal di depak ke kos random karna banyak revisi sukiiii.
+                Kategori <strong class="text-dark" x-text="'“' + targetCatName + '”'"></strong> bakal di hapus dari sistem.
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn-modal-action btn-cancel-grey" @click="openDeleteModal = false">Batal</button>
                 <button type="button" class="btn-modal-action btn-confirm-red" @click="openDeleteModal = false; successMessage = 'Kategori ' + targetCatName + ' resmi didepak dari database!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
-                    Yoi, Hapus!
+                    HAPUS
                 </button>
             </div>
         </div>

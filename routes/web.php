@@ -1,12 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes - SIGMA Project (Jalur Bypass Session Badak)
+| Web Routes - SIGMA Project (Jalur Bypass Session Paling Paten)
 |--------------------------------------------------------------------------
 */
 
@@ -15,26 +14,31 @@ Route::get('/', function () {
     if (session()->has('role')) {
         return session('role') === 'staff' ? redirect('/staff/dashboard') : redirect('/dashboard');
     }
-    return view('auth.login');
+    return view('auth.login'); // Memastikan nge-link ke file resources/views/auth/login.blade.php kalian
 })->name('login');
 
-// PROSES LOGIN BYPASS TOTAL
+// PROSES LOGIN BYPASS TOTAL (FIXED: Username & Password Wajib Match Ketat!)
 Route::post('/login', function (Request $request) {
-    $emailInput = trim($request->input('email'));
+    $emailInput = trim(strtolower($request->input('email')));
     $passwordInput = $request->input('password');
 
-    // SKENARIO 1: Username 'staff' & password kosong -> MASUK STAFF
-    if ($emailInput === 'staff' && empty($passwordInput)) {
+    // SKENARIO 1: Login murni sebagai Staff
+    if ($emailInput === 'staff' && $passwordInput === 'staff') {
         session(['role' => 'staff', 'name' => 'Erghy (Staff)']);
         return redirect('/staff/dashboard');
     }
 
-    // SKENARIO 2: Selain itu -> OTOMATIS ADMIN
-    session(['role' => 'admin', 'name' => 'Chico (Admin)']);
-    return redirect('/dashboard');
+    // SKENARIO 2: Login murni sebagai Admin
+    if ($emailInput === 'admin' && $passwordInput === 'admin') {
+        session(['role' => 'admin', 'name' => 'Chico (Admin)']);
+        return redirect('/dashboard');
+    }
+
+    // Jika salah input, balikkan ke halaman login dengan flash error message
+    return back()->with('login_error', 'Username atau Password salah, Chic! ❌');
 });
 
-// PROSES LOGOUT
+// PROSES LOGOUT UNTUK CLEAR DATA SESSION
 Route::post('/logout', function (Request $request) {
     session()->forget(['role', 'name']);
     return redirect('/');

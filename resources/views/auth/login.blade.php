@@ -38,13 +38,19 @@
         
         <h3 class="fw-bold mb-4 text-uppercase" style="letter-spacing: 0.5px; color: #111827;">WELCOME TO SIGMA</h3>
 
+        @if(session('login_error'))
+            <div class="alert alert-danger" style="border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center;">
+                {{ session('login_error') }}
+            </div>
+        @endif
+
         <form action="/login" method="POST" id="loginForm">
             @csrf 
             <div class="text-start mb-3">
                 <label class="fw-bold text-muted ms-2 mb-1">EMAIL ADDRESS / USERNAME</label>
                 <div class="form-group-custom">
                     <i class="fa-regular fa-envelope"></i>
-                    <input type="text" name="email" id="emailInput" class="form-control" placeholder="Enter your email or username" autofocus>
+                    <input type="text" name="email" id="emailInput" class="form-control" placeholder="Enter your email or username" autofocus required>
                 </div>
             </div>
             
@@ -52,7 +58,7 @@
                 <label class="fw-bold text-muted ms-2 mb-1">PASSWORD</label>
                 <div class="form-group-custom">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="••••••••">
+                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="••••••••" required>
                     <i class="fa-regular fa-eye" id="togglePassword" style="left: auto; right: 20px; cursor: pointer;"></i>
                 </div>
             </div>

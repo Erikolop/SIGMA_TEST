@@ -39,7 +39,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
-    /* 2. Search & Filter Action Bar (FIX SAMAKAN DENGAN STAFF) */
+    /* 2. Search & Filter Action Bar */
     .search-action-bar {
         display: flex;
         align-items: center;
@@ -156,7 +156,7 @@
     .icon-pen-grey { color: #9ca3af !important; cursor: pointer; }
     .icon-pen-grey:hover { color: #4b5563 !important; }
     
-    .icon-trash-red { color: #ef4444 !important; cursor: pointer; }
+    .icon-trash-red { color: #ef4444 !important; cursor: pointer; z-index: 10; position: relative; }
     .icon-trash-red:hover { color: #dc2626 !important; }
 
     /* Input Field Spinner Qty Pas Klik Edit */
@@ -233,7 +233,7 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div x-data grandfather="{ openDeleteModal: false, showNotification: false, successMessage: '', targetItemName: '', targetItemId: '' }">
+<div x-data="{ openDeleteModal: false, showNotification: false, successMessage: '', targetItemName: '', targetItemId: '', editingId: null }">
 
     <h2 class="page-title-center">Item Management</h2>
 
@@ -260,7 +260,7 @@
         </div>
     </div>
 
-    <div class="table-card-staff" x-data="{ editingId: null }">
+    <div class="table-card-staff">
         <table class="staff-table text-center align-middle">
             <thead>
                 <tr>
@@ -326,14 +326,14 @@
     <div class="modal-overlay-delete" x-show="openDeleteModal" x-transition.opacity x-cloak>
         <div class="modal-card-delete" @click.away="openDeleteModal = false" x-transition.scale>
             <div class="icon-warning-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div class="delete-modal-title">Yakin mau ngehapus ni barang?</div>
+            <div class="delete-modal-title">Yakin mau menghapus barang ini?</div>
             <div class="delete-modal-text">
-                Barang <strong class="text-dark" x-text="'“' + targetItemName + '”'"></strong> bakal di depak ke kos random karna banyak revisi sukiiii.
+                Barang <strong class="text-dark" x-text="'“' + targetItemName + '”'"></strong> bakal di hapus dari sistem.
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn-modal-action btn-cancel-grey" @click="openDeleteModal = false">Batal</button>
                 <button type="button" class="btn-modal-action btn-confirm-red" @click="openDeleteModal = false; successMessage = 'Barang ' + targetItemName + ' resmi didepak dari database!'; showNotification = true; setTimeout(() => showNotification = false, 3500)">
-                    Yoi, Hapus!
+                    HAPUS
                 </button>
             </div>
         </div>
