@@ -8,61 +8,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            background: #f9fafb; 
+            display: flex; align-items: center; justify-content: center; 
+            height: 100vh; background: #f9fafb; 
         }
-        .login-box { 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center; 
-        }
-        .form-group-custom {
-            position: relative;
-        }
+        .login-box { width: 100%; max-width: 420px; text-align: center; }
+        .form-group-custom { position: relative; }
         .form-group-custom i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
+            position: absolute; left: 20px; top: 50%;
+            transform: translateY(-50%); color: #9ca3af;
         }
         .form-control { 
-            background: #e5e7eb; 
-            border: none; 
-            border-radius: 12px; 
-            padding: 14px 20px 14px 50px; 
-            font-size: 14px;
+            background: #e5e7eb; border: none; border-radius: 12px; 
+            padding: 14px 20px 14px 50px; font-size: 14px;
         }
-        .form-control::placeholder {
-            color: #9ca3af;
-        }
-        .form-control:focus {
-            background: #e5e7eb;
-            box-shadow: 0 0 0 2px #3f3d8f;
-        }
+        .form-control::placeholder { color: #9ca3af; }
+        .form-control:focus { background: #e5e7eb; box-shadow: 0 0 0 2px #3f3d8f; }
         .btn-login { 
-            background: #2e2a85; 
-            color: white; 
-            border-radius: 25px; 
-            padding: 14px; 
-            width: 100%; 
-            font-weight: bold; 
-            margin-top: 25px; 
-            border: none;
-            transition: all 0.3s ease;
+            background: #2e2a85; color: white; border-radius: 25px; 
+            padding: 14px; width: 100%; font-weight: bold; margin-top: 25px; 
+            border: none; transition: all 0.3s ease;
         }
-        .btn-login:hover { 
-            background: #1e1b5c; 
-            color: white; 
-            transform: translateY(-1px);
-        }
-        label {
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
+        .btn-login:hover { background: #1e1b5c; color: white; transform: translateY(-1px); }
+        label { font-size: 12px; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -74,10 +41,10 @@
         <form action="/login" method="POST" id="loginForm">
             @csrf 
             <div class="text-start mb-3">
-                <label class="fw-bold text-muted ms-2 mb-1">EMAIL ADDRESS</label>
+                <label class="fw-bold text-muted ms-2 mb-1">EMAIL ADDRESS / USERNAME</label>
                 <div class="form-group-custom">
                     <i class="fa-regular fa-envelope"></i>
-                    <input type="email" name="email" id="emailInput" class="form-control" placeholder="Enter your email" value="{{ old('email') }}" autofocus>
+                    <input type="text" name="email" id="emailInput" class="form-control" placeholder="Enter your email or username" autofocus>
                 </div>
             </div>
             

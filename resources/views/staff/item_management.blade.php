@@ -1,194 +1,444 @@
 @extends('layouts.app')
 
-@section('title', 'Item Management - Staff')
-@section('header_title', 'Item Management')
+@section('title', 'Item Management - SIGMA')
 
 @section('content')
-<div class="container-fluid">
-    
-    <div id="notifSuksesStaff" class="alert alert-success alert-dismissible fade show d-none mb-3 shadow-sm" role="alert" style="border-radius: 8px; font-size: 14px; max-width: 350px; background-color: #d1e7dd; border-color: #badbcc; color: #0f5132; font-weight: 600;">
-        <i class="fa-solid fa-circle-check me-2"></i> <span id="textNotifStaff">Item berhasil ditambahkan</span>
-        <button type="button" class="btn-close" style="padding: 1rem 1rem; font-size: 10px;" onclick="tutupNotifStaff()"></button>
-    </div>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="position-relative">
-            <input type="text" class="search-input" placeholder="Search" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 16px; font-size: 14px; width: 280px;">
+<style>
+    /* Reset Spacing Content Body */
+    .content-body {
+        padding: 30px 40px !important;
+        background-color: #f4f5f9;
+    }
+
+    /* 1. Judul Gede Tengah */
+    .page-title-center {
+        text-align: center;
+        font-size: 28px;
+        font-weight: 800;
+        color: #1e1b4b;
+        margin-top: 10px;
+        margin-bottom: 40px;
+        letter-spacing: 0.5px;
+    }
+
+    /* 2. Search & Top Action Bar */
+    .search-action-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        gap: 20px;
+    }
+    .left-action-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-grow: 1;
+    }
+    .search-wrapper {
+        position: relative;
+        max-width: 280px;
+        width: 100%;
+    }
+    .search-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    .search-wrapper .form-control {
+        padding: 10px 15px 10px 42px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 13px;
+        background-color: #ffffff;
+    }
+
+    .search-by-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #ffffff;
+    }
+    .search-by-label-box {
+        background-color: #f9fafb;
+        color: #374151;
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: 600;
+        border-right: 1px solid #d1d5db;
+        white-space: nowrap;
+    }
+    .dropdown-filter-select {
+        border: none;
+        background-color: #ffffff;
+        color: #374151;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 10px 30px 10px 15px;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 14px;
+    }
+
+    .btn-add-item-blue {
+        background-color: #bfdbfe;
+        color: #1e3a8a;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 9px 18px;
+        border-radius: 8px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .btn-add-item-blue:hover {
+        background-color: #93c5fd;
+        color: #1d4ed8;
+    }
+
+    /* 3. Table Layout */
+    .table-card-staff {
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .staff-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .staff-table thead th {
+        background-color: #3f3d8f;
+        color: #ffffff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.8px;
+        padding: 18px 20px;
+        border: none;
+    }
+    .staff-table td {
+        padding: 22px 20px;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+        color: #4b5563;
+    }
+    .staff-table tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+
+    /* Actions Inline Edit */
+    .action-container-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+    }
+    .action-normal-layout, .action-edit-layout {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 16px;
+    }
+    .icon-pen-grey { color: #9ca3af !important; cursor: pointer; }
+    .qty-number-browser {
+        width: 65px;
+        padding: 4px 6px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 14px;
+        text-align: center;
+        outline: none;
+    }
+    .btn-submit-green-circle {
+        background-color: #22c55e;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+    }
+
+    .footer-purple-bar {
+        background-color: #2e2a85;
+        color: #ffffff;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+    }
+    .pg-container a {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        padding: 4px 10px;
+        font-weight: 600;
+    }
+    .active-page-box {
+        background-color: #2563eb;
+        color: #ffffff !important;
+        border-radius: 4px;
+    }
+
+    /* ==========================================
+       KUNCI PERBAIKAN: POPUP MODAL GAYA FIGMA BARU
+       ========================================== */
+    .modal-overlay-custom {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(30, 41, 59, 0.6); /* Latar gelap transparan blur */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    .modal-card-custom {
+        background-color: #ffffff;
+        width: 620px; /* Ukuran lebar proporsional figma */
+        border-radius: 16px;
+        padding: 45px 50px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        border: none;
+    }
+    
+    /* Judul Header Clean di Dalam Card */
+    .figma-header-title {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .figma-header-title h3 {
+        color: #3b82f6; /* Biru terang khas figma */
+        font-size: 32px;
+        font-weight: 500;
+        margin: 0;
+        letter-spacing: 0.5px;
+        font-family: sans-serif;
+    }
+    .figma-header-title p {
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        margin-top: 5px;
+        margin-bottom: 0;
+        text-transform: uppercase;
+    }
+
+    /* Form Fields Styling */
+    .figma-form-group {
+        margin-bottom: 24px;
+    }
+    .figma-form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: #64748b; /* Abu-abu label figma */
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .figma-form-input {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #cbd5e1; /* Border abu-abu halus figma */
+        border-radius: 8px;
+        font-size: 15px;
+        color: #334155;
+        outline: none;
+        background-color: #f8fafc; /* Latar input agak pudar */
+        transition: border-color 0.2s ease;
+    }
+    .figma-form-input:focus {
+        border-color: #3b82f6;
+        background-color: #ffffff;
+    }
+    /* Mengubah warna teks placeholder agar tipis samar-samar */
+    .figma-form-input::placeholder {
+        color: #cbd5e1;
+        font-weight: 400;
+    }
+
+    /* Link Tambah Produk */
+    .figma-add-more-link {
+        display: block;
+        text-align: center;
+        color: #3b82f6;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: underline;
+        margin-top: 30px;
+        margin-bottom: 35px;
+        cursor: pointer;
+    }
+
+    /* Tombol Kirim Utama Biru */
+    .btn-figma-submit {
+        width: 45%;
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto; /* Otomatis rata tengah */
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        transition: background 0.2s;
+    }
+    .btn-figma-submit:hover {
+        background-color: #1d4ed8;
+    }
+
+    [x-cloak] { display: none !important; }
+</style>
+
+<div x-data="{ openModal: false }">
+
+    <h2 class="page-title-center">Item Management</h2>
+
+    <div class="search-action-bar">
+        <div class="left-action-controls">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search">
+            </div>
+            
+            <div class="search-by-group">
+                <div class="search-by-label-box">Search By:</div>
+                <select class="dropdown-filter-select">
+                    <option value="item">Item</option>
+                    <option value="category">Category Item</option>
+                    <option value="stock">Stock Item</option>
+                </select>
+            </div>
         </div>
-        <button type="button" class="btn btn-catat shadow-sm" data-bs-toggle="modal" data-bs-target="#formInventarisModal">
-            Catat Transaksi
+
+        <button class="btn-add-item-blue shadow-sm" @click="openModal = true">
+            <i class="fa-solid fa-plus"></i> Add Item
         </button>
     </div>
 
-    <div class="table-container shadow-sm border-0 bg-white p-4" style="border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-        <div class="table-responsive">
-            <table class="table custom-table mb-0 align-middle text-center" style="table-layout: fixed; width: 100%;">
-                <thead>
-                    <tr>
-                        <th class="text-start ps-3" style="width: 30%">Nama Item</th>
-                        <th style="width: 30%">Category Item</th>
-                        <th style="width: 20%">Stock Item</th>
-                        <th style="width: 20%" class="text-center">ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $items = [
-                            ['name' => 'Oli Mesin', 'category' => 'Spare Part Leopard', 'stock' => 0],
-                            ['name' => 'Uranium-235', 'category' => 'Bahan Nuklir', 'stock' => 25],
-                            ['name' => 'Iphone 15', 'category' => 'Elektronik', 'stock' => 40],
-                            ['name' => 'Pelor 5.56mm', 'category' => 'Persenjataan ABRI', 'stock' => 60],
-                            ['name' => 'Router Starlink', 'category' => 'Elektronik', 'stock' => 30],
-                        ];
-                    @endphp
+    <div class="table-card-staff" x-data="{ editingId: null }">
+        <table class="staff-table text-center align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 35%;" class="text-start ps-5">Nama Item</th>
+                    <th style="width: 25%;" class="text-start">Category Item</th>
+                    <th style="width: 15%;" class="text-start">Stock Item</th>
+                    <th style="width: 25%;">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $items = [
+                        ['id' => 'st_1', 'name' => 'Oli Mesin', 'cat' => 'Spare Part Leopard', 'stock' => 0],
+                        ['id' => 'st_2', 'name' => 'Uranium-235', 'cat' => 'Bahan Nuklir', 'stock' => 25],
+                        ['id' => 'st_3', 'name' => 'Iphone 15', 'cat' => 'Elektronik', 'stock' => 40],
+                        ['id' => 'st_4', 'name' => 'Pelor 5.56mm', 'cat' => 'Persenjataan ABRI', 'stock' => 60],
+                        ['id' => 'st_5', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                        ['id' => 'st_6', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                        ['id' => 'st_7', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                        ['id' => 'st_8', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                        ['id' => 'st_9', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                        ['id' => 'st_10', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
+                    ];
+                @endphp
 
-                    @foreach($items as $index => $item)
-                    <tr id="row-{{ $index }}" style="height: 75px; border-bottom: 1px solid #f3f4f6;">
-                        <td class="text-start ps-3">
-                            <span class="fw-bold text-dark text-view">{{ $item['name'] }}</span>
-                            <div class="text-edit d-none" style="max-width: 200px;">
-                                <input type="text" id="input-name-{{ $index }}" class="form-control form-control-sm shadow-sm" value="{{ $item['name'] }}" style="font-size: 14px; border-radius: 6px;">
+                @foreach($items as $item)
+                <tr>
+                    <td class="text-start ps-5 fw-bold" style="color: #111827;">{{ $item['name'] }}</td>
+                    <td class="text-start" style="color: #4b5563; font-weight: 500;">{{ $item['cat'] }}</td>
+                    <td class="text-start font-weight-bold" style="color: #111827; font-weight: 700;">{{ $item['stock'] }}</td>
+                    <td>
+                        <div class="action-container-cell">
+                            <div class="action-normal-layout" x-show="editingId !== '{{ $item['id'] }}'">
+                                <i class="fa-solid fa-pen icon-pen-grey" @click="editingId = '{{ $item['id'] }}'"></i>
                             </div>
-                        </td>
 
-                        <td>
-                            <span class="text-muted text-view">{{ $item['category'] }}</span>
-                            <div class="text-edit d-none mx-auto" style="max-width: 200px;">
-                                <input type="text" id="input-cat-{{ $index }}" class="form-control form-control-sm shadow-sm text-center" value="{{ $item['category'] }}" style="font-size: 14px; border-radius: 6px;">
-                            </div>
-                        </td>
-
-                        <td>
-                            <span class="text-dark fw-semibold text-view-stock">{{ $item['stock'] }}</span>
-                        </td>
-
-                        <td class="text-center">
-                            <div class="action-view">
-                                <button class="btn btn-link text-dark p-0 border-0 bg-transparent" onclick="bukaModeEdit({{ $index }})">
-                                    <i class="fa-solid fa-pen fs-5"></i>
+                            <div class="action-edit-layout" x-show="editingId === '{{ $item['id'] }}'" x-cloak>
+                                <i class="fa-solid fa-pen icon-pen-grey" style="color: #4b5563 !important;"></i>
+                                <input type="number" class="qty-number-browser" value="2" min="0">
+                                <button class="btn-submit-green-circle" @click="editingId = null">
+                                    <i class="fa-solid fa-check"></i>
                                 </button>
                             </div>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-                            <div class="action-edit d-none align-items-center justify-content-center" style="gap: 15px; height: 38px;">
-                                <div style="width: 90px;">
-                                    <input type="number" id="input-stock-{{ $index }}" class="form-control text-center fw-bold form-control-sm shadow-sm" value="{{ $item['stock'] }}" min="0" style="border: 1px solid #999999; border-radius: 8px; height: 38px; font-size: 15px;">
-                                </div>
-                                <button class="btn p-0 border-0 bg-transparent text-success d-flex align-items-center" onclick="simpanModeEdit({{ $index }})">
-                                    <i class="fas fa-check-circle fs-3"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="footer-purple-bar">
+            <div>Rows per page: 10 | 1-10 of 140 rows</div>
+            <div class="pg-container">
+                <a href="#"><i class="fa-solid fa-chevron-left"></i></a>
+                <a href="#" class="active-page-box">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <span style="color: rgba(255,255,255,0.4)">...</span>
+                <a href="#">14</a>
+                <a href="#"><i class="fa-solid fa-chevron-right"></i></a>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="formInventarisModal" tabindex="-1" aria-labelledby="formInventarisModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-content-custom">
-            <div class="text-center mb-4 position-relative">
-                <h4 class="modal-title-custom m-0" id="formInventarisModalLabel">Formulir Inventaris Produk</h4>
-                <span class="modal-subtitle-custom">SIGMA</span>
-                <button type="button" class="btn-close position-absolute top-0 end-0" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-overlay-custom" x-show="openModal" x-transition.opacity x-cloak>
+        <div class="modal-card-custom" @click.away="openModal = false" x-transition.scale>
+            
+            <div class="figma-header-title">
+                <h3>FORMULIR INVENTARIS PRODUK</h3>
+                <p>SIGMA</p>
             </div>
             
-            <form id="formTambahBarangStaff" onsubmit="prosesTambahStaff(event)">
-                <div class="mb-4">
-                    <label class="form-label form-label-custom">Nama Produk</label>
-                    <input type="text" class="form-control form-control-custom w-100" required placeholder="Contoh: Meja Kerja Kayu Jati">
+            <form @submit.prevent="openModal = false">
+                
+                <div class="figma-form-group">
+                    <label class="figma-form-label">Nama Produk</label>
+                    <input type="text" class="figma-form-input" placeholder="Contoh: Meja Kerja Kayu Jati">
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label form-label-custom">Jumlah Unit</label>
-                    <input type="number" class="form-control form-control-custom w-100" required placeholder="0" min="1">
+                
+                <div class="figma-form-group">
+                    <label class="figma-form-label">Jumlah Unit</label>
+                    <input type="number" class="figma-form-input" value="0" min="0">
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label form-label-custom">Tipe Kelola</label>
-                    <input type="text" class="form-control form-control-custom w-100" required placeholder="Contoh: Keluar atau Masuk">
+                
+                <div class="figma-form-group">
+                    <label class="figma-form-label">Tipe Kelola</label>
+                    <input type="text" class="figma-form-input" placeholder="Contoh: Keluar atau Masuk">
                 </div>
-
-                <div class="text-center mb-4">
-                    <button type="button" class="btn-tambah-link">+ Tambah Produk Lainnya</button>
-                </div>
-
-                <div class="text-center">
-                    <button type="submit" class="btn-kirim shadow-sm">Kirim</button>
-                </div>
+                
+                <span class="figma-add-more-link" @click="alert('Fitur tambah form menyusul, Chic!')">+ Tambah Produk Lainnya</span>
+                
+                <button type="submit" class="btn-figma-submit">KIRIM</button>
+                
             </form>
         </div>
     </div>
+
 </div>
-
-<script>
-    function bukaModeEdit(index) {
-        var row = document.getElementById('row-' + index);
-        
-        row.querySelectorAll('.text-view').forEach(el => el.classList.add('d-none'));
-        row.querySelectorAll('.text-edit').forEach(el => el.classList.remove('d-none'));
-        
-        row.querySelector('.text-view-stock').classList.add('d-none');
-        row.querySelector('.action-view').classList.add('d-none');
-        
-        var editAction = row.querySelector('.action-edit');
-        editAction.classList.remove('d-none');
-        editAction.classList.add('d-flex');
-    }
-
-    function simpanModeEdit(index) {
-        var row = document.getElementById('row-' + index);
-        
-        var newName = document.getElementById('input-name-' + index).value;
-        var newCat = document.getElementById('input-cat-' + index).value;
-        var newStock = document.getElementById('input-stock-' + index).value;
-        
-        row.querySelectorAll('.text-view')[0].innerText = newName;
-        row.querySelectorAll('.text-view')[1].innerText = newCat;
-        row.querySelector('.text-view-stock').innerText = newStock;
-        
-        row.querySelectorAll('.text-view').forEach(el => el.classList.remove('d-none'));
-        row.querySelectorAll('.text-edit').forEach(el => el.classList.add('d-none'));
-        row.querySelector('.text-view-stock').classList.remove('d-none');
-        
-        row.querySelector('.action-view').classList.remove('d-none');
-        var editAction = row.querySelector('.action-edit');
-        editAction.classList.add('d-none');
-        editAction.classList.remove('d-flex');
-        
-        document.getElementById('textNotifStaff').innerText = "Item berhasil diubah";
-        var notif = document.getElementById('notifSuksesStaff');
-        notif.classList.remove('d-none');
-        
-        setTimeout(function() {
-            tutupNotifStaff();
-        }, 4000);
-    }
-
-    function prosesTambahStaff(event) {
-        event.preventDefault(); 
-        var modalElemen = document.getElementById('formInventarisModal');
-        var modalInstance = bootstrap.Modal.getInstance(modalElemen);
-        modalInstance.hide();
-
-        document.getElementById('textNotifStaff').innerText = "Item berhasil ditambahkan";
-        var notif = document.getElementById('notifSuksesStaff');
-        notif.classList.remove('d-none');
-
-        document.getElementById('formTambahBarangStaff').reset();
-        
-        setTimeout(function() {
-            tutupNotifStaff();
-        }, 4000);
-    }
-
-    function tutupNotifStaff() {
-        var notif = document.getElementById('notifSuksesStaff');
-        if(notif) {
-            notif.classList.add('d-none');
-        }
-    }
-</script>
 @endsection
