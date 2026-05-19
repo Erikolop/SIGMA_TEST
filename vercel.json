@@ -22,8 +22,8 @@
 
 "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
-    "APP_URL": "",
+    "APP_DEBUG": "false",
+    "APP_URL": "https://SIGMA.vercel.app",
     "APP_KEY": "base64:3WjMp1gqbf9AKiUMzkuaYJewd5MXZHV4MAFfRdunU78=",
 
     "APP_CONFIG_CACHE": "/tmp/config.php",
