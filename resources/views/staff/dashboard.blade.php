@@ -138,14 +138,14 @@
         <div class="col-md-4">
             <div class="stat-card total-items">
                 <span class="card-title-custom">Total Items</span>
-                <div class="card-value">100</div>
+                <div class="card-value">{{ $totalItems }}</div>
                 <i class="fa-regular fa-clipboard card-icon"></i>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card low-stock">
                 <span class="card-title-custom">Low Stock</span>
-                <div class="card-value">12</div>
+                <div class="card-value">{{ $lowStock }}</div>
                 <i class="fa-solid fa-triangle-exclamation card-icon"></i>
             </div>
         </div>
@@ -174,26 +174,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($lowestStockItems as $item)
                             <tr>
-                                <td class="fw-bold-dark text-start ps-3">Kayu Jati</td>
-                                <td>Furniture</td>
-                                <td class="fw-bold-dark">452</td>
+                                <td class="fw-bold-dark text-start ps-3">{{ $item->item_name }}</td>
+                                <td>{{ $item->kategori->nama_kategori ?? '-' }}</td>
+                                <td class="{{ $item->item_qty == 0 ? 'text-danger-custom' : ($item->item_qty < 20 ? 'text-warning-custom' : 'fw-bold-dark') }}">{{ $item->item_qty }}</td>
                             </tr>
+                            @empty
                             <tr>
-                                <td class="fw-bold-dark text-start ps-3">Kabel</td>
-                                <td>Elektronik</td>
-                                <td class="text-warning-custom">2,000</td>
+                                <td colspan="3" class="text-center text-muted py-3">Belum ada data barang</td>
                             </tr>
-                            <tr>
-                                <td class="fw-bold-dark text-start ps-3">Kaca</td>
-                                <td>Optik</td>
-                                <td class="text-danger-custom">0</td>
-                              </tr>
-                            <tr>
-                                <td class="fw-bold-dark text-start ps-3">Cat</td>
-                                <td>Material</td>
-                                <td class="fw-bold-dark">1,024</td>
-                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

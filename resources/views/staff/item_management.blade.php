@@ -215,19 +215,20 @@
 
     <div class="search-action-bar">
         <div class="left-action-controls">
+            <form method="GET" action="{{ route('Item') }}" class="d-flex align-items-center gap-3" style="flex-grow:1;">
             <div class="search-wrapper">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" class="form-control" placeholder="Search">
+                <input type="text" name="search" class="form-control" placeholder="Search" value="{{ request('search') }}">
             </div>
             
             <div class="search-by-group">
                 <div class="search-by-label-box">Search By:</div>
-                <select class="dropdown-filter-select">
-                    <option value="item">Item</option>
-                    <option value="category">Category Item</option>
-                    <option value="stock">Stock Item</option>
+                <select name="search_by" class="dropdown-filter-select" onchange="this.form.submit()">
+                    <option value="item" {{ request('search_by') == 'item' ? 'selected' : '' }}>Item</option>
+                    <option value="category" {{ request('search_by') == 'category' ? 'selected' : '' }}>Category Item</option>
                 </select>
             </div>
+            </form>
         </div>
         </div>
 
@@ -242,57 +243,53 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $items = [
-                        ['id' => 'st_1', 'name' => 'Oli Mesin', 'cat' => 'Spare Part Leopard', 'stock' => 0],
-                        ['id' => 'st_2', 'name' => 'Uranium-235', 'cat' => 'Bahan Nuklir', 'stock' => 25],
-                        ['id' => 'st_3', 'name' => 'Iphone 15', 'cat' => 'Elektronik', 'stock' => 40],
-                        ['id' => 'st_4', 'name' => 'Pelor 5.56mm', 'cat' => 'Persenjataan ABRI', 'stock' => 60],
-                        ['id' => 'st_5', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                        ['id' => 'st_6', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                        ['id' => 'st_7', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                        ['id' => 'st_8', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                        ['id' => 'st_9', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                        ['id' => 'st_10', 'name' => 'Router Starlink', 'cat' => 'Elektronik', 'stock' => 30],
-                    ];
-                @endphp
-
-                @foreach($items as $item)
+            <tbody>
+                @forelse($items as $item)
                 <tr>
-                    <td class="text-start ps-5 fw-bold" style="color: #111827;">{{ $item['name'] }}</td>
-                    <td class="text-start" style="color: #4b5563; font-weight: 500;">{{ $item['cat'] }}</td>
-                    <td class="text-start font-weight-bold" style="color: #111827; font-weight: 700;">{{ $item['stock'] }}</td>
+                    <td class="text-start ps-5 fw-bold" style="color: #111827;">{{ $item->item_name }}</td>
+                    <td class="text-start" style="color: #4b5563; font-weight: 500;">{{ $item->kategori->nama_kategori ?? '-' }}</td>
+                    <td class="text-start font-weight-bold" style="color: #111827; font-weight: 700;">{{ $item->item_qty }}</td>
                     <td>
                         <div class="action-container-cell">
-                            <div class="action-normal-layout" x-show="editingId !== '{{ $item['id'] }}'">
-                                <i class="fa-solid fa-pen icon-pen-grey" @click="editingId = '{{ $item['id'] }}'"></i>
+                            <div class="action-normal-layout" x-show="editingId !== {{ $item->id }}">
+                                <i class="fa-solid fa-pen icon-pen-grey" @click="editingId = {{ $item->id }}"></i>
                             </div>
 
-                            <div class="action-edit-layout" x-show="editingId === '{{ $item['id'] }}'" x-cloak>
+                            <div class="action-edit-layout" x-show="editingId === {{ $item->id }}" x-cloak>
                                 <i class="fa-solid fa-pen icon-pen-grey" style="color: #4b5563 !important;"></i>
-                                <input type="number" class="qty-number-browser" value="{{ $item['stock'] }}" min="0">
-                                
-                                <button class="btn-submit-green-circle" @click="editingId = null; successMessage = 'Stok {{ $item['name'] }} berhasil diperbarui!'; showNotification = true; setTimeout(() => showNotification = false, 3000)">
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
+                                <form method="POST" action="{{ route('itemProcess') }}" class="d-flex align-items-center gap-2">
+                                    @csrf
+                                    <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                    <select name="jenis_mutasi" class="form-select form-select-sm" style="width:100px;">
+                                        <option value="Increase">+ Tambah</option>
+                                        <option value="Decrease">- Kurang</option>
+                                    </select>
+                                    <input type="number" name="perubahan_qty" class="qty-number-browser" value="1" min="1">
+                                    <button type="submit" class="btn-submit-green-circle" title="Simpan Perubahan">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">Belum ada data barang</td>
+                </tr>
+                @endforelse
+            </tbody>
             </tbody>
         </table>
 
         <div class="footer-purple-bar">
-            <div>Rows per page: 10 | 1-10 of 140 rows</div>
+            <div>Rows per page: 10 | {{ $items->firstItem() }}-{{ $items->lastItem() }} of {{ $items->total() }} rows</div>
             <div class="pg-container">
-                <a href="#"><i class="fa-solid fa-chevron-left"></i></a>
-                <a href="#" class="active-page-box">1</a>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <span style="color: rgba(255,255,255,0.4)">...</span>
-                <a href="#">14</a>
-                <a href="#"><i class="fa-solid fa-chevron-right"></i></a>
+                <a href="{{ $items->previousPageUrl() }}"><i class="fa-solid fa-chevron-left"></i></a>
+                @foreach($items->getUrlRange(1, $items->lastPage()) as $page => $url)
+                    <a href="{{ $url }}" class="{{ $page == $items->currentPage() ? 'active-page-box' : '' }}">{{ $page }}</a>
+                @endforeach
+                <a href="{{ $items->nextPageUrl() }}"><i class="fa-solid fa-chevron-right"></i></a>
             </div>
         </div>
     </div>

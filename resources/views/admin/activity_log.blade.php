@@ -208,9 +208,10 @@
     </div>
 
     <div class="filter-section">
+        <form method="GET" action="{{ route('adminActivityLog') }}" class="d-flex gap-3 align-items-center">
         <div class="search-box-custom">
             <i class="fa-solid fa-search"></i>
-            <input type="text" class="form-control" placeholder="Search">
+            <input type="text" name="search" class="form-control" placeholder="Search" value="{{ request('search') }}">
         </div>
         
         <div class="calendar-interactive-container">
@@ -218,9 +219,10 @@
                 <button type="button" class="btn-calendar">
                     <i class="fa-regular fa-calendar-days fs-5"></i>
                 </button>
-                <input type="date" class="input-date-hidden-overlay" 
+                <input type="date" name="date" class="input-date-hidden-overlay" 
                        x-model="selectedDate"
-                       @change="if(selectedDate) { showBadge = true } else { showBadge = false }">
+                       @change="if(selectedDate) { showBadge = true; $el.form.submit() } else { showBadge = false }"
+                       value="{{ request('date') }}">
             </div>
 
             <div class="slide-date-badge" 
@@ -234,11 +236,13 @@
                  x-cloak>
                 <i class="fa-solid fa-filter fs-7"></i>
                 <span x-text="selectedDate"></span>
-                <button type="button" class="btn-clear-date" @click="selectedDate = ''; showBadge = false" title="Hapus Filter">
+                <button type="button" class="btn-clear-date" @click="selectedDate = ''; showBadge = false; window.location='{{ route('adminActivityLog') }}'" title="Hapus Filter">
                     <i class="fa-solid fa-circle-xmark"></i>
                 </button>
             </div>
         </div>
+        <button type="submit" class="btn btn-sm btn-primary" style="display:none;"></button>
+        </form>
     </div>
 
     <div class="table-responsive-custom">
@@ -255,90 +259,37 @@
                 </tr>
             </thead>
             <tbody>
+                @forelse($logs as $log)
                 <tr>
-                    <td class="text-start text-out"><i class="fa-solid fa-cart-shopping me-2"></i>Order Out</td>
-                    <td class="text-muted-time">Oct 24, 14:22</td>
-                    <td>Bambang</td>
-                    <td>Kardus</td>
-                    <td>1,240</td>
-                    <td class="text-out">-150</td>
-                    <td class="fw-bold-dark">1,090</td>
+                    <td class="text-start {{ $log->jenis_mutasi === 'Order Out' ? 'text-out' : 'text-in' }}">
+                        <i class="fa-solid fa-cart-shopping me-2"></i>{{ $log->jenis_mutasi }}
+                    </td>
+                    <td class="text-muted-time">{{ $log->tgl_transaksi ? $log->tgl_transaksi->format('M d, H:i') : '-' }}</td>
+                    <td>{{ $log->nama_user }}</td>
+                    <td>{{ $log->nama_item }}</td>
+                    <td>{{ number_format($log->sebelum_qty) }}</td>
+                    <td class="{{ $log->jenis_mutasi === 'Order Out' ? 'text-out' : 'text-in' }}">
+                        {{ $log->jenis_mutasi === 'Order Out' ? '-' : '+' }}{{ number_format($log->perubahan_qty) }}
+                    </td>
+                    <td class="fw-bold-dark">{{ number_format($log->sebelum_qty + ($log->jenis_mutasi === 'Order In' ? $log->perubahan_qty : -$log->perubahan_qty)) }}</td>
                 </tr>
+                @empty
                 <tr>
-                    <td class="text-start text-in"><i class="fa-solid fa-cart-shopping me-2"></i>Order In</td>
-                    <td class="text-muted-time">Oct 24, 11:05</td>
-                    <td>Sarah</td>
-                    <td>Kain</td>
-                    <td>740</td>
-                    <td class="text-in">+500</td>
-                    <td class="fw-bold-dark">1,240</td>
+                    <td colspan="7" class="text-center text-muted py-4">Belum ada aktivitas</td>
                 </tr>
-                <tr>
-                    <td class="text-start text-in"><i class="fa-solid fa-cart-shopping me-2"></i>Order In</td>
-                    <td class="text-muted-time">Oct 23, 16:45</td>
-                    <td>Alex</td>
-                    <td>Cat</td>
-                    <td>745</td>
-                    <td class="text-out">-5</td>
-                    <td class="fw-bold-dark">740</td>
-                </tr>
-                <tr>
-                    <td class="text-start text-in"><i class="fa-solid fa-cart-shopping me-2"></i>Order In</td>
-                    <td class="text-muted-time">Oct 23, 09:12</td>
-                    <td>Kusuma</td>
-                    <td>Kayu</td>
-                    <td>712</td>
-                    <td class="text-in">+33</td>
-                    <td class="fw-bold-dark">745</td>
-                </tr>
-                <tr>
-                    <td class="text-start text-out"><i class="fa-solid fa-cart-shopping me-2"></i>Order Out</td>
-                    <td class="text-muted-time">Oct 22, 18:30</td>
-                    <td>Daffa</td>
-                    <td>Semen</td>
-                    <td>752</td>
-                    <td class="text-out">-40</td>
-                    <td class="fw-bold-dark">712</td>
-                </tr>
-                <tr>
-                    <td class="text-start text-out"><i class="fa-solid fa-cart-shopping me-2"></i>Order Out</td>
-                    <td class="text-muted-time">Oct 22, 10:15</td>
-                    <td>Ciko</td>
-                    <td>Kaca</td>
-                    <td>800</td>
-                    <td class="text-out">-48</td>
-                    <td class="fw-bold-dark">752</td>
-                </tr>
-                <tr>
-                    <td class="text-start text-out"><i class="fa-solid fa-cart-shopping me-2"></i>Order Out</td>
-                    <td class="text-muted-time">Oct 24, 14:22</td>
-                    <td>Bambang</td>
-                    <td>Kardus</td>
-                    <td>1,240</td>
-                    <td class="text-out">-150</td>
-                    <td class="fw-bold-dark">1,090</td>
-                </tr>
-                <tr>
-                    <td class="text-start text-in"><i class="fa-solid fa-cart-shopping me-2"></i>Order In</td>
-                    <td class="text-muted-time">Oct 24, 11:05</td>
-                    <td>Sarah</td>
-                    <td>Kain</td>
-                    <td>740</td>
-                    <td class="text-in">+500</td>
-                    <td class="fw-bold-dark">1,240</td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <div class="footer-purple-bar">
-        <div>Showing 1-14 of 14 records</div>
+        <div>Showing {{ $logs->firstItem() ?? 0 }}-{{ $logs->lastItem() ?? 0 }} of {{ $logs->total() }} records</div>
         <div class="pagination-custom">
-            <a href="#"><i class="fa-solid fa-chevron-left"></i></a>
-            <a href="#" class="active-page">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#"><i class="fa-solid fa-chevron-right"></i></a>
+            <a href="{{ $logs->previousPageUrl() }}"><i class="fa-solid fa-chevron-left"></i></a>
+            @foreach($logs->getUrlRange(1, $logs->lastPage()) as $page => $url)
+                <a href="{{ $url }}" class="{{ $page == $logs->currentPage() ? 'active-page' : '' }}">{{ $page }}</a>
+            @endforeach
+            <a href="{{ $logs->nextPageUrl() }}"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
     </div>
 </div>

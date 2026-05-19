@@ -1,62 +1,86 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
+use App\Http\Controllers\auth\AuthController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ActivitylogController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ItemController;
+use App\Models\Item;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes - SIGMA Project (Jalur Bypass Session Paling Paten)
-|--------------------------------------------------------------------------
-*/
+/* ─────────────────────────────────────
+   Guest routes  (unauthenticated only)
+───────────────────────────────────── */
+Route::middleware('guest')->group(function () {
+    Route::get('/', fn() => redirect()->route('login'));
 
-// 1. Halaman Login Utama
-Route::get('/', function () {
-    if (session()->has('role')) {
-        return session('role') === 'staff' ? redirect('/staff/dashboard') : redirect('/dashboard');
-    }
-    return view('auth.login'); // Memastikan nge-link ke file resources/views/auth/login.blade.php kalian
-})->name('login');
+    Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login',   [AuthController::class, 'login']);
 
-// PROSES LOGIN BYPASS TOTAL (FIXED: Username & Password Wajib Match Ketat!)
-Route::post('/login', function (Request $request) {
-    $emailInput = trim(strtolower($request->input('email')));
-    $passwordInput = $request->input('password');
-
-    // SKENARIO 1: Login murni sebagai Staff
-    if ($emailInput === 'staff' && $passwordInput === 'staff') {
-        session(['role' => 'staff', 'name' => 'Erghy (Staff)']);
-        return redirect('/staff/dashboard');
-    }
-
-    // SKENARIO 2: Login murni sebagai Admin
-    if ($emailInput === 'admin' && $passwordInput === 'admin') {
-        session(['role' => 'admin', 'name' => 'Chico (Admin)']);
-        return redirect('/dashboard');
-    }
-
-    // Jika salah input, balikkan ke halaman login dengan flash error message
-    return back()->with('login_error', 'Username atau Password salah, Chic! ❌');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register',[AuthController::class, 'register']);
 });
 
-// PROSES LOGOUT UNTUK CLEAR DATA SESSION
-Route::post('/logout', function (Request $request) {
-    session()->forget(['role', 'name']);
-    return redirect('/');
-})->name('logout');
+/* ─────────────────────────────────────
+   Authenticated routes
+───────────────────────────────────── */
+Route::middleware('auth')->group(function () {
 
+    // Dashboard — redirects based on role
+    Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('viewDashboard');
 
-// ==========================================
-// 2. JALUR AKSES ADMIN
-// ==========================================
-Route::get('/dashboard', function () { return view('admin.dashboard'); });
-Route::get('/admin/item-management', function () { return view('admin.item_management'); });
-Route::get('/admin/category-management', function () { return view('admin.category'); });
-Route::get('/admin/category-detail', function () { return view('admin.category_detail'); });
-Route::get('/admin/staff-management', function () { return view('admin.staff'); });
-Route::get('/admin/activity-log', function () { return view('admin.activity_log'); });
+    // Item Management (shared — staff & admin)
+    Route::get('/item-management', [ItemController::class, 'Item'])->name('Item');
 
-// ==========================================
-// 3. JALUR AKSES STAFF
-// ==========================================
-Route::get('/staff/dashboard', function () { return view('staff.dashboard'); });
-Route::get('/staff/item-management', function () { return view('staff.item_management'); });
+    // Kelola Barang (legacy — kept for backward compatibility)
+    Route::get('/kelola-barang',  [StaffController::class, 'itemManagement'])->name('itemManagement');
+    Route::post('/kelola-barang', [StaffController::class, 'itemProcess'])->name('itemProcess');
+
+    // Activity Log (staff version)
+    Route::get('/activity-log', [ActivitylogController::class, 'activityLog'])->name('activityLog');
+
+    // Data Barang (legacy)
+    Route::get('/data-barang', [StaffController::class, 'viewItem'])->name('viewItem');
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Item routes (shared — edit stock for staff, full CRUD for admin handled by middleware in controller)
+    Route::put('/item/edit/{id}',    [ItemController::class, 'editItem'])->name('editItem');
+    Route::delete('/item/delete/{id}', [ItemController::class, 'deleteItem'])->name('deleteItem');
+    Route::post('/item/bulk-delete', [ItemController::class, 'bulkDeleteItems'])->name('bulkDeleteItems');
+
+    /* ─────────────────────────────────────
+       Admin-only routes
+    ───────────────────────────────────── */
+    Route::prefix('admin')->middleware('admin')->group(function () {
+
+        // Admin Dashboard
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('adminDashboard');
+
+        // Category Management
+        Route::get('/category-management', [CategoryController::class, 'categoryManagement'])->name('categoryManagement');
+        Route::get('/category/{id}', [CategoryController::class, 'detailCategory'])->name('detailCategory');
+        Route::post('/category/add', [CategoryController::class,  'addCategory'])->name('addCategory');
+        Route::delete('/category/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('deleteCategory');
+        Route::put('/category/edit/{id}', [CategoryController::class, 'editCategory'])->name('editCategory');
+        Route::post('/category/bulk-delete', [CategoryController::class, 'bulkDeleteCategories'])->name('bulkDeleteCategories');
+
+        // Detail Category — edit item from detail page
+        Route::put('/category/{categoryId}/item/{id}', [CategoryController::class, 'editItemFromDetail'])->name('editItemFromDetail');
+
+        // Item Management — admin add items
+        Route::post('/item/add', [ItemController::class, 'addItems'])->name('addItems');
+
+        // Staff Management
+        Route::get('/staff-management', [AdminController::class, 'staffManagement'])->name('staffManagement');
+        Route::post('/staff/add',       [AdminController::class, 'addStaff'])->name('addStaff');
+        Route::put('/staff/edit/{id}',  [AdminController::class, 'editStaff'])->name('editStaff');
+        Route::delete('/staff/delete/{id}', [AdminController::class, 'deleteStaff'])->name('deleteStaff');
+        Route::post('/staff/bulk-delete', [AdminController::class, 'bulkDeleteStaff'])->name('bulkDeleteStaff');
+
+        // Activity Log (admin version)
+        Route::get('/activity-log', [AdminController::class, 'activityLog'])->name('adminActivityLog');
+    });
+});

@@ -12,7 +12,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-muted small fw-bold mb-2" style="letter-spacing: 0.5px; font-size: 11px;">TOTAL ITEMS</div>
-                        <h2 class="fw-bold m-0 text-dark" style="font-size: 32px;">100</h2>
+                        <h2 class="fw-bold m-0 text-dark" style="font-size: 32px;">{{ $totalItems }}</h2>
                     </div>
                     <i class="far fa-clipboard text-primary fs-3"></i>
                 </div>
@@ -24,7 +24,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-muted small fw-bold mb-2" style="letter-spacing: 0.5px; font-size: 11px;">OUT OF STOCK</div>
-                        <h2 class="fw-bold m-0 text-danger" style="font-size: 32px;">3</h2>
+                        <h2 class="fw-bold m-0 text-danger" style="font-size: 32px;">{{ $outOfStock }}</h2>
                     </div>
                     <i class="far fa-times-circle text-danger fs-3"></i>
                 </div>
@@ -36,7 +36,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-muted small fw-bold mb-2" style="letter-spacing: 0.5px; font-size: 11px;">LOW STOCK</div>
-                        <h2 class="fw-bold m-0" style="color: #b45309; font-size: 32px;">12</h2>
+                        <h2 class="fw-bold m-0" style="color: #b45309; font-size: 32px;">{{ $lowStock }}</h2>
                     </div>
                     <i class="fas fa-exclamation-triangle text-warning fs-3"></i>
                 </div>
@@ -88,26 +88,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($recentLogs as $log)
                             <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kayu Jati</td>
-                                <td class="text-center text-muted py-3 border-0">xx/xx/xxxx</td>
-                                <td class="text-center fw-bold py-3 border-0 text-dark">452</td>
+                                <td class="text-start fw-bold text-dark py-3 border-0">{{ $log->nama_item }}</td>
+                                <td class="text-center text-muted py-3 border-0">{{ $log->tgl_transaksi ? $log->tgl_transaksi->format('d/m/Y') : '-' }}</td>
+                                <td class="text-center fw-bold py-3 border-0 text-dark">{{ $log->perubahan_qty }}</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kabel</td>
-                                <td class="text-center text-muted py-3 border-0">xx/xx/xxxx</td>
-                                <td class="text-center fw-bold py-3 border-0" style="color: #b45309;">8</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kaca</td>
-                                <td class="text-center text-muted py-3 border-0">xx/xx/xxxx</td>
-                                <td class="text-center fw-bold text-danger py-3 border-0">0</td>
-                            </tr>
+                            @empty
                             <tr>
-                                <td class="text-start fw-bold text-dark py-3 border-0">Cat</td>
-                                <td class="text-center text-muted py-3 border-0">xx/xx/xxxx</td>
-                                <td class="text-center fw-bold py-3 border-0 text-dark">1,024</td>
+                                <td colspan="3" class="text-center text-muted py-3 border-0">Belum ada aktivitas</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -126,22 +117,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($lowestStockItems as $item)
                             <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kayu Jati</td>
-                                <td class="text-center text-dark fw-bold py-3 border-0">100</td>
+                                <td class="text-start fw-bold text-dark py-3 border-0">{{ $item->item_name }}</td>
+                                <td class="text-center fw-bold py-3 border-0 {{ $item->item_qty == 0 ? 'text-danger' : ($item->item_qty < 20 ? 'text-warning' : 'text-dark') }}">{{ $item->item_qty }}</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kabel</td>
-                                <td class="text-center text-dark fw-bold py-3 border-0">120</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #f3f4f6;">
-                                <td class="text-start fw-bold text-dark py-3 border-0">Kaca</td>
-                                <td class="text-center text-dark fw-bold py-3 border-0">300</td>
-                            </tr>
+                            @empty
                             <tr>
-                                <td class="text-start fw-bold text-dark py-3 border-0">Cat</td>
-                                <td class="text-center text-dark fw-bold py-3 border-0">200</td>
+                                <td colspan="2" class="text-center text-muted py-3 border-0">Belum ada data barang</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

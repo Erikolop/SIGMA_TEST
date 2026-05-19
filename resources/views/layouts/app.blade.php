@@ -48,27 +48,30 @@
             <div>
                 <div class="sidebar-brand">SIGMA</div>
                 <div class="nav-menu">
-                    @if(session('role') === 'staff')
-                        <a href="/staff/dashboard" class="nav-link-custom {{ Request::is('staff/dashboard') ? 'active' : '' }}">
+                @if(Auth::check() && Auth::user()->role === 'Staff')
+                        <a href="{{ route('viewDashboard') }}" class="nav-link-custom {{ Request::is('dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-table-cells-large"></i> Dashboard
                         </a>
-                        <a href="/staff/item-management" class="nav-link-custom {{ Request::is('staff/item-management') ? 'active' : '' }}">
+                        <a href="{{ route('Item') }}" class="nav-link-custom {{ Request::is('item-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-cart-shopping"></i> Item Management
+                        </a>
+                        <a href="{{ route('activityLog') }}" class="nav-link-custom {{ Request::is('activity-log') ? 'active' : '' }}">
+                            <i class="fa-solid fa-chart-line"></i> Activity Log
                         </a>
                     @else
-                        <a href="/dashboard" class="nav-link-custom {{ Request::is('dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('adminDashboard') }}" class="nav-link-custom {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-table-cells-large"></i> Dashboard
                         </a>
-                        <a href="/admin/item-management" class="nav-link-custom {{ Request::is('*item-management*') ? 'active' : '' }}">
+                        <a href="{{ route('Item') }}" class="nav-link-custom {{ Request::is('item-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-cart-shopping"></i> Item Management
                         </a>
-                        <a href="/admin/category-management" class="nav-link-custom {{ Request::is('*category-management*') ? 'active' : '' }}">
+                        <a href="{{ route('categoryManagement') }}" class="nav-link-custom {{ Request::is('admin/category-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-layer-group"></i> Category Management
                         </a>
-                        <a href="/admin/staff-management" class="nav-link-custom {{ Request::is('*staff-management*') ? 'active' : '' }}">
+                        <a href="{{ route('staffManagement') }}" class="nav-link-custom {{ Request::is('admin/staff-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-users"></i> Staff Management
                         </a>
-                        <a href="/admin/activity-log" class="nav-link-custom {{ Request::is('*activity-log*') ? 'active' : '' }}">
+                        <a href="{{ route('adminActivityLog') }}" class="nav-link-custom {{ Request::is('admin/activity-log') ? 'active' : '' }}">
                             <i class="fa-solid fa-chart-line"></i> Activity Log
                         </a>
                     @endif
@@ -78,15 +81,15 @@
 
             <div class="sidebar-bottom">
                 <div class="user-profile-section">
-                    @if(session()->has('role'))
+                    @auth
                         <div class="user-info">
-                            <h6>{{ session('name') }}</h6>
-                            <span class="text-capitalize">{{ session('role') }}<br>V1.0</span>
+                            <h6>{{ Auth::user()->name }}</h6>
+                            <span class="text-capitalize">{{ Auth::user()->role }}<br>V1.0</span>
                         </div>
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode(session('name')) }}&background={{ session('role') === 'staff' ? '111827' : '3f3d8f' }}&color=fff" class="rounded-circle" style="width: 40px; height: 40px;" alt="Avatar User">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background={{ Auth::user()->role === 'Staff' ? '111827' : '3f3d8f' }}&color=fff" class="rounded-circle" style="width: 40px; height: 40px;" alt="Avatar User">
                     @else
                         <div class="user-info"><h6>Guest</h6><span>Visitor</span></div>
-                    @endif
+                    @endauth
                 </div>
 
                 <a href="#" class="btn-logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
