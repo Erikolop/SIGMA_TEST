@@ -76,7 +76,7 @@
                         </a>
                     @endif
                 </div>
-                <img src="{{ asset('images/fotodbkiri.png') }}" class="sidebar-illustration" alt="Gudang Illustration">
+                <img src="/images/fotodbkiri.png" class="sidebar-illustration" alt="Gudang Illustration">
             </div>
 
             <div class="sidebar-bottom">

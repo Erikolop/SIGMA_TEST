@@ -34,7 +34,7 @@
 </head>
 <body>
     <div class="login-box p-4">
-        <img src="{{ asset('images/logosigma.png') }}" class="img-fluid mb-3" style="max-height: 180px; width: auto;" alt="Logo SIGMA">
+        <img src="/images/logosigma.png" class="img-fluid mb-3" style="max-height: 180px; width: auto;" alt="Logo SIGMA">
         
         <h3 class="fw-bold mb-4 text-uppercase" style="letter-spacing: 0.5px; color: #111827;">WELCOME TO SIGMA</h3>
 
