@@ -43,10 +43,13 @@
     .btn-modal-action { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; }
     .btn-cancel-grey { background-color: #f1f5f9; color: #475569; }
     .btn-confirm-red { background-color: #ef4444; color: #ffffff; }
+    .modal-overlay-custom { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(30, 41, 59, 0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-card-custom { background-color: #ffffff; width: 560px; border-radius: 16px; padding: 35px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
+    .btn-add-item-dark { background-color: #1e1b4b; color: #ffffff; font-size: 12px; font-weight: 700; padding: 11px 22px; border-radius: 8px; border: none; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     [x-cloak] { display: none !important; }
 </style>
 
-<div x-data="{ showNotification: false, successMessage: '', openDeleteModal: false, targetItemName: '', targetItemId: 0 }">
+<div x-data="{ showNotification: false, successMessage: '', openDeleteModal: false, openAddModal: false, targetItemName: '', targetItemId: 0 }">
 
     <a href="{{ route('categoryManagement') }}" class="btn-return-figma">
         <i class="fa-solid fa-arrow-right-from-bracket"></i> Return to Category
@@ -72,6 +75,10 @@
             </div>
             <button type="submit" class="btn btn-sm btn-secondary">Cari</button>
         </form>
+
+        <button type="button" class="btn-add-item-dark shadow-sm" @click="openAddModal = true">
+            <i class="fa-solid fa-plus"></i> Add Item
+        </button>
     </div>
 
     <div class="table-container-detail">
@@ -145,6 +152,87 @@
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn-modal-action btn-cancel-grey" @click="openDeleteModal = false">Batal</button>
                     <button type="submit" class="btn-modal-action btn-confirm-red">HAPUS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal Add Item --}}
+    <div class="modal-overlay-custom" x-show="openAddModal" x-transition.opacity x-cloak>
+        <div class="modal-card-custom" @click.away="openAddModal = false"
+             x-data="{
+                 items: [{ item_name: '', id_kategori: '{{ $category->id }}', item_qty: 0 }],
+                 maxItems: 3,
+                 addRow() {
+                     if (this.items.length < this.maxItems) {
+                         this.items.push({ item_name: '', id_kategori: '{{ $category->id }}', item_qty: 0 });
+                     }
+                 },
+                 removeRow(index) {
+                     if (this.items.length > 1) {
+                         this.items.splice(index, 1);
+                     }
+                 }
+             }">
+            <h4 class="text-center mb-4" style="color: #3f3d8f; font-weight: 700;">ADD NEW ITEM</h4>
+            <form method="POST" action="{{ route('addItems') }}">
+                @csrf
+
+                <template x-for="(item, index) in items" :key="index">
+                    <div class="border rounded p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold" style="font-size: 13px; color: #3f3d8f;">
+                                Item <span x-text="index + 1"></span>
+                            </div>
+                            <button type="button"
+                                    x-show="items.length > 1"
+                                    @click="removeRow(index)"
+                                    style="color: #ef4444; background: none; border: none; font-size: 13px; padding: 0; cursor: pointer;">
+                                <i class="fa-solid fa-xmark"></i> Hapus
+                            </button>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Nama Item</label>
+                            <input type="text"
+                                   :name="'items[' + index + '][item_name]'"
+                                   x-model="item.item_name"
+                                   class="form-control form-control-sm"
+                                   placeholder="Nama barang"
+                                   required>
+                        </div>
+                        <div>
+                            <input type="hidden"
+                                   :name="'items[' + index + '][id_kategori]'"
+                                   value="{{ $category->id }}">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Stok Awal</label>
+                            <input type="number"
+                                   :name="'items[' + index + '][item_qty]'"
+                                   x-model="item.item_qty"
+                                   class="form-control form-control-sm"
+                                   value="0" min="0"
+                                   required>
+                        </div>
+                    </div>
+                </template>
+
+                <button type="button"
+                        @click="addRow()"
+                        x-show="items.length < maxItems"
+                        class="btn btn-sm w-100 mb-3"
+                        style="border: 1px dashed #3f3d8f; color: #3f3d8f; background: #f8f9ff; font-size: 13px; font-weight: 600; border-radius: 8px; padding: 8px;">
+                    <i class="fa-solid fa-plus me-1"></i>
+                    Tambah Item (<span x-text="maxItems - items.length"></span> slot tersisa)
+                </button>
+
+                <div class="d-flex justify-content-end gap-2 mt-1">
+                    <button type="button" class="btn btn-secondary btn-sm"
+                            @click="openAddModal = false; items = [{ item_name: '', id_kategori: '{{ $category->id }}', item_qty: 0 }]">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: #3f3d8f; border: none;">
+                        Simpan (<span x-text="items.length"></span> item)
+                    </button>
                 </div>
             </form>
         </div>

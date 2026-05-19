@@ -148,35 +148,90 @@
 
     {{-- Modal Add Item (Admin only) --}}
     <div class="modal-overlay-custom" x-show="openAddModal" x-transition.opacity x-cloak>
-        <div class="modal-card-custom" @click.away="openAddModal = false">
+        <div class="modal-card-custom" @click.away="openAddModal = false"
+             x-data="{
+                 items: [{ item_name: '', id_kategori: '', item_qty: 0 }],
+                 maxItems: 3,
+                 addRow() {
+                     if (this.items.length < this.maxItems) {
+                         this.items.push({ item_name: '', id_kategori: '', item_qty: 0 });
+                     }
+                 },
+                 removeRow(index) {
+                     if (this.items.length > 1) {
+                         this.items.splice(index, 1);
+                     }
+                 }
+             }">
             <h4 class="text-center mb-4" style="color: #3f3d8f; font-weight: 700;">ADD NEW ITEM</h4>
             <form method="POST" action="{{ route('addItems') }}">
                 @csrf
-                @for($i = 0; $i < 3; $i++)
-                <div class="border rounded p-3 mb-3">
-                    <div class="fw-bold mb-2" style="font-size: 13px; color: #3f3d8f;">Item {{ $i + 1 }} {{ $i > 0 ? '(opsional)' : '' }}</div>
-                    <div class="mb-2">
-                        <label class="form-label fw-bold" style="font-size: 12px;">Nama Item</label>
-                        <input type="text" name="items[{{ $i }}][item_name]" class="form-control form-control-sm" placeholder="Nama barang" {{ $i === 0 ? 'required' : '' }}>
+
+                <template x-for="(item, index) in items" :key="index">
+                    <div class="border rounded p-3 mb-3" style="position: relative;">
+                        {{-- Row label + remove button --}}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold" style="font-size: 13px; color: #3f3d8f;">
+                                Item <span x-text="index + 1"></span>
+                            </div>
+                            <button type="button"
+                                    x-show="items.length > 1"
+                                    @click="removeRow(index)"
+                                    class="btn btn-sm"
+                                    style="color: #ef4444; background: none; border: none; font-size: 13px; padding: 0; cursor: pointer;"
+                                    title="Hapus baris ini">
+                                <i class="fa-solid fa-xmark"></i> Hapus
+                            </button>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Nama Item</label>
+                            <input type="text"
+                                   :name="'items[' + index + '][item_name]'"
+                                   x-model="item.item_name"
+                                   class="form-control form-control-sm"
+                                   placeholder="Nama barang"
+                                   required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" style="font-size: 12px;">Kategori</label>
+                            <select :name="'items[' + index + '][id_kategori]'"
+                                    x-model="item.id_kategori"
+                                    class="form-select form-select-sm"
+                                    required>
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label fw-bold" style="font-size: 12px;">Stok Awal</label>
+                            <input type="number"
+                                   :name="'items[' + index + '][item_qty]'"
+                                   x-model="item.item_qty"
+                                   class="form-control form-control-sm"
+                                   value="0" min="0"
+                                   required>
+                        </div>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label fw-bold" style="font-size: 12px;">Kategori</label>
-                        <select name="items[{{ $i }}][id_kategori]" class="form-select form-select-sm" {{ $i === 0 ? 'required' : '' }}>
-                            <option value="">-- Pilih Kategori --</option>
-                            @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label fw-bold" style="font-size: 12px;">Stok Awal</label>
-                        <input type="number" name="items[{{ $i }}][item_qty]" class="form-control form-control-sm" value="0" min="0" {{ $i === 0 ? 'required' : '' }}>
-                    </div>
-                </div>
-                @endfor
-                <div class="d-flex justify-content-end gap-2 mt-3">
-                    <button type="button" class="btn btn-secondary btn-sm" @click="openAddModal = false">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: #3f3d8f; border: none;">Simpan</button>
+                </template>
+
+                {{-- Add more row button --}}
+                <button type="button"
+                        @click="addRow()"
+                        x-show="items.length < maxItems"
+                        class="btn btn-sm w-100 mb-3"
+                        style="border: 1px dashed #3f3d8f; color: #3f3d8f; background: #f8f9ff; font-size: 13px; font-weight: 600; border-radius: 8px; padding: 8px;">
+                    <i class="fa-solid fa-plus me-1"></i>
+                    Tambah Item (<span x-text="maxItems - items.length"></span> slot tersisa)
+                </button>
+
+                <div class="d-flex justify-content-end gap-2 mt-1">
+                    <button type="button" class="btn btn-secondary btn-sm" @click="openAddModal = false; items = [{ item_name: '', id_kategori: '', item_qty: 0 }]">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: #3f3d8f; border: none;">
+                        Simpan (<span x-text="items.length"></span> item)
+                    </button>
                 </div>
             </form>
         </div>

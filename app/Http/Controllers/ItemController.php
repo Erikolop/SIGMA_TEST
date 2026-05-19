@@ -33,7 +33,7 @@ class ItemController extends Controller
         $categories = Kategori::all();
 
         // Admin gets the admin view with full CRUD; staff gets the stock-update-only view
-        if (auth()->user()->role === 'Admin') {
+        if (Auth::User()->role === 'Admin') {
             return view('admin.item_management', compact('items', 'categories'));
         }
 
@@ -49,7 +49,10 @@ class ItemController extends Controller
             'items.*.item_qty'   => 'required|integer|min:0',
         ]);
 
-        foreach ($request->items as $itemData) {
+        // Filter out any accidentally empty rows (safety net)
+        $rows = collect($request->items)->filter(fn($row) => !empty($row['item_name']));
+
+        foreach ($rows as $itemData) {
             Item::create([
                 'item_name'   => $itemData['item_name'],
                 'id_kategori' => $itemData['id_kategori'],
@@ -57,7 +60,7 @@ class ItemController extends Controller
             ]);
         }
 
-        return redirect()->route('Item');
+        return redirect()->route('Item')->with('success', $rows->count() . ' item berhasil ditambahkan.');
     }
 
     public function editItem(Request $request, $id)

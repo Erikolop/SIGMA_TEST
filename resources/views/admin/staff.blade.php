@@ -129,7 +129,7 @@
                     <td>
                         <div class="action-icons-box">
                             <i class="fa-solid fa-pen icon-edit-grey"
-                               @click="editData = { id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ $u->email }}', role: '{{ $u->role }}' }; openEditModal = true"></i>
+                               @click="editData = { id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ $u->email }}', role: '{{ $u->role }}' }; document.getElementById('editStaffForm').action = '{{ url('/admin/staff/edit') }}/' + {{ $u->id }}; openEditModal = true"></i>
                             <i class="fa-solid fa-trash-can icon-delete-red"
                                @click="targetStaffName = '{{ addslashes($u->name) }}'; targetStaffId = {{ $u->id }}; openDeleteModal = true"></i>
                         </div>
@@ -192,9 +192,9 @@
     <div class="modal-overlay-custom" x-show="openEditModal" x-transition.opacity x-cloak>
         <div class="modal-card-custom" @click.away="openEditModal = false">
             <h4 class="text-center mb-4" style="color: #3f3d8f; font-weight: 700;">EDIT USER ACCOUNT</h4>
-            <form method="POST" :action="'{{ url('/admin/staff/edit') }}/' + editData.id">
+            <form method="POST" id="editStaffForm" action="">
                 @csrf
-                @method('PUT')
+                <input type="hidden" name="_method" value="PUT">
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Full Name</label>
                     <input type="text" name="name" class="form-control" x-model="editData.name" required>
@@ -206,8 +206,8 @@
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Role</label>
                     <select name="role" class="form-select" x-model="editData.role" required>
-                        <option value="Admin">Admin</option>
-                        <option value="Staff">Staff</option>
+                        <option value="Admin" :selected="editData.role === 'Admin'">Admin</option>
+                        <option value="Staff" :selected="editData.role === 'Staff'">Staff</option>
                     </select>
                 </div>
                 <div class="mb-3 text-start">

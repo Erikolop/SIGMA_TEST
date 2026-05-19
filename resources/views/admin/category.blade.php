@@ -54,6 +54,13 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
     <div class="action-bar-category">
         <form method="GET" action="{{ route('categoryManagement') }}" class="d-flex align-items-center gap-3" style="flex-grow:1;">
             <div class="search-box-category">

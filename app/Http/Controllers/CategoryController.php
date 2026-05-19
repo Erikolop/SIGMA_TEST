@@ -12,7 +12,8 @@ class CategoryController extends Controller
 {
     public function detailCategory(Request $request, $id)
     {
-        $category = Kategori::findOrFail($id);
+        $category   = Kategori::findOrFail($id);
+        $categories = Kategori::all();
 
         $query = Item::where('id_kategori', $id);
 
@@ -22,7 +23,7 @@ class CategoryController extends Controller
 
         $items = $query->paginate(10)->appends($request->only('search'));
 
-        return view('admin.category_detail', compact('category', 'items'));
+        return view('admin.category_detail', compact('category', 'categories', 'items'));
     }
 
     public function categoryManagement(Request $request)
@@ -39,15 +40,35 @@ class CategoryController extends Controller
 
     public function deleteCategory($id)
     {
-        Kategori::destroy($id);
-        return redirect()->route('categoryManagement');
+        $kategori = Kategori::withCount('items')->findOrFail($id);
+
+        if ($kategori->items_count > 0) {
+            return redirect()->route('categoryManagement')
+                ->with('error', "Kategori \"{$kategori->nama_kategori}\" tidak bisa dihapus karena masih memiliki {$kategori->items_count} item. Hapus atau pindahkan item terlebih dahulu.");
+        }
+
+        $kategori->delete();
+        return redirect()->route('categoryManagement')
+            ->with('success', "Kategori \"{$kategori->nama_kategori}\" berhasil dihapus.");
     }
 
     public function bulkDeleteCategories(Request $request)
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'integer']);
+
+        $blocked = Kategori::withCount('items')
+            ->whereIn('id', $request->ids)
+            ->having('items_count', '>', 0)
+            ->pluck('nama_kategori');
+
+        if ($blocked->isNotEmpty()) {
+            return redirect()->route('categoryManagement')
+                ->with('error', 'Kategori berikut tidak bisa dihapus karena masih memiliki item: ' . $blocked->join(', ') . '. Hapus atau pindahkan item terlebih dahulu.');
+        }
+
         Kategori::whereIn('id', $request->ids)->delete();
-        return redirect()->route('categoryManagement');
+        return redirect()->route('categoryManagement')
+            ->with('success', count($request->ids) . ' kategori berhasil dihapus.');
     }
 
     public function editCategory(Request $request, $id)
