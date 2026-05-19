@@ -44,7 +44,7 @@ class CategoryController extends Controller
 
         if ($kategori->items_count > 0) {
             return redirect()->route('categoryManagement')
-                ->with('error', "Kategori \"{$kategori->nama_kategori}\" tidak bisa dihapus karena masih memiliki {$kategori->items_count} item. Hapus atau pindahkan item terlebih dahulu.");
+                ->with('error', "Hapus item terlebih dahulu.");
         }
 
         $kategori->delete();
@@ -63,7 +63,7 @@ class CategoryController extends Controller
 
         if ($blocked->isNotEmpty()) {
             return redirect()->route('categoryManagement')
-                ->with('error', 'Kategori berikut tidak bisa dihapus karena masih memiliki item: ' . $blocked->join(', ') . '. Hapus atau pindahkan item terlebih dahulu.');
+                ->with('error', 'Hapus item terlebih dahulu.');
         }
 
         Kategori::whereIn('id', $request->ids)->delete();

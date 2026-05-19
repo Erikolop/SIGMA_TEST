@@ -41,35 +41,45 @@ class AdminController extends Controller
 
     public function addStaff(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name'     => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role'     => 'required|in:Admin,Staff',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->route('staffManagement')
+                ->with('error', 'Cant add new user. Username or email has already been taken.');
+        }
+
         User::create([
             'name'     => $request->name,
+            'username' => $request->username,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
         ]);
 
-        return redirect()->route('staffManagement');
+        return redirect()->route('staffManagement')
+            ->with('success', 'User ' . $request->name . ' berhasil ditambahkan.');
     }
 
     public function editStaff(Request $request, $id)
     {
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'role'  => 'required|in:Admin,Staff',
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'email'    => 'required|email|unique:users,email,' . $id,
+            'role'     => 'required|in:Admin,Staff',
         ]);
 
         $user = User::findOrFail($id);
-        $user->name  = $request->name;
-        $user->email = $request->email;
-        $user->role  = $request->role;
+        $user->name     = $request->name;
+        $user->username = $request->username;
+        $user->email    = $request->email;
+        $user->role     = $request->role;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

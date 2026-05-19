@@ -55,9 +55,6 @@
                         <a href="{{ route('Item') }}" class="nav-link-custom {{ Request::is('item-management') ? 'active' : '' }}">
                             <i class="fa-solid fa-cart-shopping"></i> Item Management
                         </a>
-                        <a href="{{ route('activityLog') }}" class="nav-link-custom {{ Request::is('activity-log') ? 'active' : '' }}">
-                            <i class="fa-solid fa-chart-line"></i> Activity Log
-                        </a>
                     @else
                         <a href="{{ route('adminDashboard') }}" class="nav-link-custom {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-table-cells-large"></i> Dashboard

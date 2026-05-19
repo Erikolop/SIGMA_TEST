@@ -23,3 +23,4 @@ class AdminMiddleware
             ->with('error', 'Access denied. Admin privileges required.');
     }
 }
+

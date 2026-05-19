@@ -63,7 +63,7 @@
     targetStaffId: 0,
     selectedUsers: [],
     allUserIds: {{ $all_ids }},
-    editData: { id: 0, name: '', email: '', role: '' },
+    editData: { id: 0, name: '', email: '', username: '', role: '' },
     toggleAll() {
         if (this.selectedUsers.length === this.allUserIds.length) {
             this.selectedUsers = [];
@@ -79,6 +79,13 @@
     <div class="alert-success-figma">
         <i class="fa-solid fa-circle-check"></i>
         <span>{{ session('success') }}</span>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ session('error') }}</span>
     </div>
     @endif
 
@@ -129,7 +136,7 @@
                     <td>
                         <div class="action-icons-box">
                             <i class="fa-solid fa-pen icon-edit-grey"
-                               @click="editData = { id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ $u->email }}', role: '{{ $u->role }}' }; document.getElementById('editStaffForm').action = '{{ url('/admin/staff/edit') }}/' + {{ $u->id }}; openEditModal = true"></i>
+                               @click="editData = { id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ $u->email }}', username: '{{ addslashes($u->username) }}', role: '{{ $u->role }}' }; document.getElementById('editStaffForm').action = '{{ url('/admin/staff/edit') }}/' + {{ $u->id }}; openEditModal = true"></i>
                             <i class="fa-solid fa-trash-can icon-delete-red"
                                @click="targetStaffName = '{{ addslashes($u->name) }}'; targetStaffId = {{ $u->id }}; openDeleteModal = true"></i>
                         </div>
@@ -166,6 +173,10 @@
                     <input type="text" name="name" class="form-control" placeholder="Masukkan nama lengkap" required>
                 </div>
                 <div class="mb-3 text-start">
+                    <label class="form-label fw-bold" style="font-size: 13px;">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan username" required>
+                </div>
+                <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Email</label>
                     <input type="email" name="email" class="form-control" placeholder="Contoh: user@gmail.com" required>
                 </div>
@@ -198,6 +209,10 @@
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Full Name</label>
                     <input type="text" name="name" class="form-control" x-model="editData.name" required>
+                </div>
+                <div class="mb-3 text-start">
+                    <label class="form-label fw-bold" style="font-size: 13px;">Username</label>
+                    <input type="text" name="username" class="form-control" x-model="editData.username" required>
                 </div>
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold" style="font-size: 13px;">Email</label>
